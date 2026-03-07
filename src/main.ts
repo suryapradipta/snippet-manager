@@ -29,26 +29,51 @@ const resultsList = document.getElementById('results-list') as HTMLUListElement;
 const addForm = document.getElementById('add-form') as HTMLDivElement;
 const addTitle = document.getElementById('add-title') as HTMLInputElement;
 const addContent = document.getElementById('add-content') as HTMLTextAreaElement;
+const mainFooter = document.getElementById('main-footer') as HTMLDivElement;
+const addFooter = document.getElementById('add-footer') as HTMLDivElement;
+const btnSave = document.getElementById('btn-save') as HTMLButtonElement;
+const btnCancel = document.getElementById('btn-cancel') as HTMLButtonElement;
 
 let isAdding = false;
 
 async function init() {
-  snippets = await window.electronAPI.getSnippets();
-
-  // Seed with example if empty
-  if (snippets.length === 0) {
-    snippets = [
-      { id: '1', title: 'React Functional Component', content: 'export default function Component() {\n  return <div>Hello</div>;\n}', createdAt: Date.now() },
-      { id: '2', title: 'Console Log', content: 'console.log("Here:", );', createdAt: Date.now() - 1000 },
-      { id: '3', title: 'Current Date', content: new Date().toISOString().split('T')[0], createdAt: Date.now() - 2000 }
-    ];
-    await window.electronAPI.saveSnippets(snippets);
+  console.log('[App] Initializing...');
+  if (!window.electronAPI) {
+    resultsList.innerHTML = '<li class="snippet-item" style="text-align: center; color: #ff5555; pointer-events: none;">Critical Error: Electron API not found. Preload script might have failed.</li>';
+    return;
+  }
+  
+  try {
+    snippets = await window.electronAPI.getSnippets();
+    console.log('[App] Loaded snippets:', snippets.length);
+  } catch (err) {
+    console.error('[App] Failed to load snippets:', err);
+    snippets = [];
   }
 
+  // Seed with example if empty (REMOVED)
+  
   filterSnippets('');
 
   // Focus input automatically
   searchInput.focus();
+}
+
+btnSave.onclick = () => saveNewSnippet();
+btnCancel.onclick = () => toggleAddForm();
+
+async function deleteSnippet(id: string, event?: MouseEvent) {
+  if (event) {
+    event.stopPropagation();
+  }
+
+  if (!confirm('Are you sure you want to delete this snippet?')) {
+    return;
+  }
+
+  snippets = snippets.filter(s => s.id !== id);
+  await window.electronAPI.saveSnippets(snippets);
+  filterSnippets(searchInput.value);
 }
 
 function renderResults() {
@@ -74,12 +99,32 @@ function renderResults() {
     titleDiv.className = 'snippet-title';
     titleDiv.textContent = snippet.title;
 
+    const deleteBtn = document.createElement('div');
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.innerHTML = `
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"></polyline>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        <line x1="10" y1="11" x2="10" y2="17"></line>
+        <line x1="14" y1="11" x2="14" y2="17"></line>
+      </svg>
+    `;
+    deleteBtn.onclick = (e) => {
+      e.stopPropagation();
+      deleteSnippet(snippet.id, e);
+    };
+
+    const headerDiv = document.createElement('div');
+    headerDiv.className = 'snippet-header';
+    headerDiv.appendChild(titleDiv);
+    headerDiv.appendChild(deleteBtn);
+
     const previewDiv = document.createElement('div');
     previewDiv.className = 'snippet-preview';
     // Single line preview mapping newlines to spaces
     previewDiv.textContent = snippet.content.replace(/\n/g, ' ↵ ');
 
-    li.appendChild(titleDiv);
+    li.appendChild(headerDiv);
     li.appendChild(previewDiv);
     resultsList.appendChild(li);
   });
@@ -105,8 +150,10 @@ function filterSnippets(query: string) {
 }
 
 async function triggerPaste() {
+  console.log('[App] triggerPaste called, filteredSnippets length:', filteredSnippets.length);
   if (filteredSnippets.length > 0) {
     const selected = filteredSnippets[selectedIndex];
+    console.log('[App] Sending paste IPC for snippet:', selected.title);
     await window.electronAPI.pasteSnippet(selected.content);
   }
 }
@@ -126,11 +173,15 @@ async function toggleAddForm() {
     addTitle.focus();
     addTitle.value = searchInput.value; // pre-fill with search term if any
     addContent.value = '';
+    mainFooter.classList.add('hidden');
+    addFooter.classList.remove('hidden');
   } else {
     addForm.classList.add('hidden');
     resultsList.classList.remove('hidden');
     searchInput.disabled = false;
     searchInput.focus();
+    mainFooter.classList.remove('hidden');
+    addFooter.classList.add('hidden');
   }
 }
 
@@ -149,7 +200,11 @@ async function saveNewSnippet() {
 
   snippets.push(newSnippet);
   await window.electronAPI.saveSnippets(snippets);
-  filterSnippets(searchInput.value); // Re-filter and render
+  
+  // Clear search input so the new snippet is visible at the top of the list
+  searchInput.value = '';
+  filterSnippets('');
+  
   toggleAddForm(); // Close form
 }
 
@@ -165,10 +220,15 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       e.preventDefault();
       toggleAddForm();
-    } else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-      // Cmd+Enter to save snippet
-      e.preventDefault();
-      saveNewSnippet();
+    } else if (e.key === 'Enter') {
+      if (e.shiftKey) {
+        // Shift+Enter allows newline in textarea, do nothing special
+        return;
+      } else {
+        // Simple Enter to save snippet
+        e.preventDefault();
+        saveNewSnippet();
+      }
     }
     return;
   }
@@ -189,6 +249,11 @@ document.addEventListener('keydown', (e) => {
   } else if (e.key === 'Enter') {
     e.preventDefault();
     triggerPaste();
+  } else if (e.key === 'Backspace' || e.key === 'Delete') {
+    if (filteredSnippets.length > 0) {
+      e.preventDefault();
+      deleteSnippet(filteredSnippets[selectedIndex].id);
+    }
   } else if (e.key === 'Escape') {
     // Hide window logic could optionally go here, but blur handles it
   }

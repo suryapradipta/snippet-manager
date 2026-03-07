@@ -1,4 +1,4 @@
-import { app, globalShortcut, ipcMain, BrowserWindow } from "electron";
+import { app, globalShortcut, ipcMain, clipboard, BrowserWindow } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 import { exec } from "child_process";
@@ -22,7 +22,7 @@ function createWindow() {
     hasShadow: true,
     show: false,
     webPreferences: {
-      preload: path.join(__dirname$1, "preload.mjs"),
+      preload: path.join(__dirname$1, "preload.js"),
       sandbox: false
     }
   });
@@ -51,26 +51,41 @@ app.whenReady().then(() => {
   });
   ipcMain.handle("get-snippets", () => {
     const raw = fs.readFileSync(STORE_PATH, "utf-8");
+    console.log("[Electron] get-snippets returning:", raw.substring(0, 100) + "...");
     return JSON.parse(raw);
   });
   ipcMain.handle("save-snippets", (e, snippets) => {
+    console.log("[Electron] save-snippets called with", snippets.length, "items");
     fs.writeFileSync(STORE_PATH, JSON.stringify(snippets, null, 2));
+    console.log("[Electron] File written successfully");
   });
   ipcMain.handle("paste-snippet", async (e, text) => {
+    console.log("[Electron] paste-snippet IPC received with text length:", text.length);
     if (mainWindow) {
       mainWindow.hide();
+      if (process.platform === "darwin") {
+        app.hide();
+      }
     }
-    const { clipboard } = require("electron");
     clipboard.writeText(text);
+    const delay = process.platform === "darwin" ? 500 : 100;
     setTimeout(() => {
+      console.log("[Electron] Attempting auto-paste simulation...");
       if (process.platform === "darwin") {
         const script = `osascript -e 'tell application "System Events" to keystroke "v" using command down'`;
-        exec(script);
+        exec(script, (error, stdout, stderr) => {
+          if (error) console.error("[Electron] Paste script error:", error);
+          if (stderr) console.error("[Electron] Paste script stderr:", stderr);
+          console.log("[Electron] Auto-paste simulation complete");
+        });
       } else if (process.platform === "win32") {
         const script = `powershell -c "$wshell = New-Object -ComObject wscript.shell; $wshell.SendKeys('^v')"`;
-        exec(script);
+        exec(script, (error) => {
+          if (error) console.error("[Electron] Paste script error:", error);
+          console.log("[Electron] Auto-paste simulation complete");
+        });
       }
-    }, 50);
+    }, delay);
   });
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {

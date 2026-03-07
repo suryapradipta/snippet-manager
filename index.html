@@ -31,12 +31,22 @@
     <div id="add-form" class="hidden">
       <input id="add-title" type="text" placeholder="Snippet Title" autocomplete="off" />
       <textarea id="add-content" placeholder="Paste your snippet here..." rows="4"></textarea>
+      <div class="button-group">
+        <button id="btn-cancel" class="btn-secondary">Cancel</button>
+        <button id="btn-save" class="btn-primary">Save Snippet</button>
+      </div>
     </div>
 
-    <div class="footer">
-      <div><kbd>↑</kbd> <kbd>↓</kbd> to navigate</div>
-      <div><kbd>Enter</kbd> to paste</div>
-      <div><kbd>Cmd+Ctrl+N</kbd> to add</div>
+    <div class="footer" id="main-footer">
+      <div><kbd>↑</kbd> <kbd>↓</kbd> navigate</div>
+      <div><kbd>Enter</kbd> copy</div>
+      <div><kbd>Cmd/Ctrl + N</kbd> new</div>
+    </div>
+    
+    <div class="footer hidden" id="add-footer">
+      <div><kbd>Enter</kbd> save</div>
+      <div><kbd>Shift + Enter</kbd> new line</div>
+      <div><kbd>Esc</kbd> cancel</div>
     </div>
   </div>
   <script type="module" src="/src/main.ts"></script>
