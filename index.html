@@ -5,48 +5,137 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Snippet Manager</title>
-  <!-- Add Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 </head>
 
 <body>
-  <div id="app">
-    <div class="search-container">
-      <!-- SVG Search Icon -->
-      <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"></circle>
-        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-      </svg>
-      <input id="search-input" type="text" placeholder="Search snippets... (or Create New)" autocomplete="off" />
-    </div>
-
-    <ul id="results-list">
-      <!-- Snippets will be injected here -->
-    </ul>
-
-    <!-- Add Snippet Form -->
-    <div id="add-form" class="hidden">
-      <input id="add-title" type="text" placeholder="Snippet Title" autocomplete="off" />
-      <textarea id="add-content" placeholder="Paste your snippet here..." rows="4"></textarea>
-      <div class="button-group">
-        <button id="btn-cancel" class="btn-secondary">Cancel</button>
-        <button id="btn-save" class="btn-primary">Save Snippet</button>
+  <div id="app" class="glass-container">
+    <!-- Header / Search -->
+    <header class="app-header">
+      <span class="material-symbols-outlined search-icon">search</span>
+      <input id="search-input" type="text" placeholder="Search snippets..." autocomplete="off" autofocus />
+      <div class="header-shortcuts">
+        <kbd>Esc</kbd>
       </div>
-    </div>
+    </header>
 
-    <div class="footer" id="main-footer">
-      <div><kbd>↑</kbd> <kbd>↓</kbd> navigate</div>
-      <div><kbd>Enter</kbd> copy</div>
-      <div><kbd>Cmd/Ctrl + N</kbd> new</div>
-    </div>
-    
-    <div class="footer hidden" id="add-footer">
-      <div><kbd>Enter</kbd> save</div>
-      <div><kbd>Shift + Enter</kbd> new line</div>
-      <div><kbd>Esc</kbd> cancel</div>
+    <!-- Main Content Area: Split View -->
+    <main class="main-content">
+      <!-- Snippet List (Left) -->
+      <aside class="sidebar">
+        <ul id="results-list" class="glass-scroll">
+          <!-- Snippets injected here -->
+        </ul>
+      </aside>
+
+      <!-- Preview Pane (Right) -->
+      <section id="preview-pane" class="preview-pane hidden">
+        <header class="preview-header">
+          <span class="preview-label">Preview</span>
+          <div class="preview-actions">
+            <button id="btn-copy-preview" title="Copy Content">
+              <span class="material-symbols-outlined">content_copy</span>
+            </button>
+            <button id="btn-edit-preview" title="Edit Snippet">
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+            <button id="btn-delete-preview" title="Delete Snippet">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </div>
+        </header>
+        <div id="preview-content" class="preview-body glass-scroll">
+          <!-- Content injected here -->
+        </div>
+      </section>
+
+      <!-- Empty State for Preview -->
+      <section id="preview-empty" class="preview-pane empty-state">
+        <div class="empty-message">
+          <span class="material-symbols-outlined">description</span>
+          <p>Select a snippet to preview</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer / Status Bar -->
+    <footer class="app-footer">
+      <div class="footer-left">
+        <div class="shortcut-item">
+          <kbd>↑</kbd> <kbd>↓</kbd>
+          <span>Navigate</span>
+        </div>
+        <div class="divider"></div>
+        <div class="shortcut-item">
+          <kbd>Enter</kbd>
+          <span>Paste</span>
+        </div>
+        <div class="divider"></div>
+        <div class="shortcut-item">
+          <kbd>⌘N</kbd>
+          <span>New Snippet</span>
+        </div>
+      </div>
+      <div class="footer-right">
+        <span class="status-dot"></span>
+        <span class="status-text">GlassOS Reader</span>
+      </div>
+    </footer>
+
+    <!-- Modals moved inside #app for integrated layout -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+      <!-- Create/Edit Modal -->
+      <div id="editor-modal" class="modal glass-panel">
+        <header class="modal-header">
+          <div class="header-title">
+            <h1 id="modal-title">Create Snippet</h1>
+            <p id="modal-subtitle">Define a new shortcut for your workflow</p>
+          </div>
+          <button id="btn-close-modal" class="btn-close">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </header>
+        
+        <div class="modal-body glass-scroll">
+          <div class="form-group">
+            <label>Label / Title</label>
+            <div class="input-with-icon">
+              <span class="material-symbols-outlined input-icon">label</span>
+              <input id="add-title" type="text" placeholder="e.g. Welcome Message" autocomplete="off" />
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <div class="editor-header">
+              <label>Content</label>
+              <span class="editor-type">Markdown / Code</span>
+            </div>
+            <div class="editor-outer-container">
+              <div class="line-numbers">
+                <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+              </div>
+              <textarea id="add-content" placeholder="Write your snippet content here..." spellcheck="false"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <footer class="modal-footer">
+          <div class="footer-status">
+            <div class="status-dot green"></div>
+            <span>Ready to save</span>
+          </div>
+          <div class="modal-actions">
+            <button id="btn-cancel" class="btn-ghost">Cancel</button>
+            <button id="btn-save" class="btn-primary">
+              Save Snippet
+              <kbd>⌘ ↵</kbd>
+            </button>
+          </div>
+        </footer>
+      </div>
     </div>
   </div>
   <script type="module" src="/src/main.ts"></script>

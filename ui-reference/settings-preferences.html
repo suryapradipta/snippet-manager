@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>GlassOS Settings</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#818CF8", // Using the accent color from PRD for better visibility on dark
+                        "primary-dark": "#0a1af5", // Keeping the original primary request as a darker variant
+                        "glass-bg": "rgba(22, 22, 24, 0.65)",
+                        "glass-border": "rgba(255, 255, 255, 0.08)",
+                        "glass-highlight": "rgba(255, 255, 255, 0.12)",
+                        "surface": "rgba(255, 255, 255, 0.05)",
+                        "surface-hover": "rgba(255, 255, 255, 0.08)",
+                        "text-main": "#F3F4F6",
+                        "text-muted": "#9CA3AF",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"],
+                    },
+                    backdropBlur: {
+                        "xs": "2px",
+                        "xl": "24px",
+                    },
+                    boxShadow: {
+                        "glass": "0 40px 80px -20px rgba(0,0,0,0.6)",
+                        "glow": "0 0 15px rgba(129, 140, 248, 0.3)",
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar for the glass look */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Glass effect utility class */
+        .glass-panel {
+            background: rgba(22, 22, 24, 0.75);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Toggle Switch Animation */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #818CF8;
+        }
+
+        .toggle-checkbox:checked+.toggle-label {
+            background-color: #818CF8;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&amp;w=2564&amp;auto=format&amp;fit=crop')] bg-cover bg-center bg-no-repeat min-h-screen flex items-center justify-center font-display text-text-main selection:bg-primary/30 selection:text-white overflow-hidden p-4"
+    data-alt="Abstract dark fluid gradient background representing a modern desktop wallpaper">
+    <!-- Main Settings Window -->
+    <main
+        class="glass-panel w-full max-w-[900px] h-[650px] rounded-2xl flex flex-col md:flex-row overflow-hidden relative z-10 animate-fade-in-up">
+        <!-- Sidebar -->
+        <aside
+            class="w-full md:w-64 flex flex-col border-b md:border-b-0 md:border-r border-glass-border bg-black/20 md:bg-transparent">
+            <!-- Header -->
+            <div class="p-6 pb-2">
+                <div class="flex items-center gap-3 mb-6">
+                    <div
+                        class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center shadow-glow">
+                        <span class="material-symbols-outlined text-white text-[20px]">layers</span>
+                    </div>
+                    <div>
+                        <h1 class="text-white font-semibold text-sm tracking-wide">GlassOS</h1>
+                        <p class="text-text-muted text-xs font-medium">Pro v2.4.0</p>
+                    </div>
+                </div>
+                <div class="h-px w-full bg-glass-border mb-4"></div>
+            </div>
+            <!-- Navigation -->
+            <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
+                <button
+                    class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/10 text-white group transition-all duration-200 border border-white/5 shadow-sm">
+                    <span class="material-symbols-outlined text-[20px] text-primary">settings</span>
+                    <span class="text-sm font-medium">General</span>
+                </button>
+                <button
+                    class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-muted hover:text-white hover:bg-white/5 transition-all duration-200 group">
+                    <span
+                        class="material-symbols-outlined text-[20px] group-hover:text-white transition-colors">keyboard</span>
+                    <span class="text-sm font-medium">Hotkeys</span>
+                </button>
+                <button
+                    class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-muted hover:text-white hover:bg-white/5 transition-all duration-200 group">
+                    <span
+                        class="material-symbols-outlined text-[20px] group-hover:text-white transition-colors">palette</span>
+                    <span class="text-sm font-medium">Theme</span>
+                </button>
+                <button
+                    class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-muted hover:text-white hover:bg-white/5 transition-all duration-200 group">
+                    <span
+                        class="material-symbols-outlined text-[20px] group-hover:text-white transition-colors">account_circle</span>
+                    <span class="text-sm font-medium">Account</span>
+                </button>
+                <button
+                    class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-muted hover:text-white hover:bg-white/5 transition-all duration-200 group">
+                    <span
+                        class="material-symbols-outlined text-[20px] group-hover:text-white transition-colors">info</span>
+                    <span class="text-sm font-medium">About</span>
+                </button>
+            </nav>
+            <!-- Bottom Actions -->
+            <div class="p-4 border-t border-glass-border mt-auto">
+                <button
+                    class="flex items-center gap-2 text-xs text-text-muted hover:text-white transition-colors w-full px-2 py-1">
+                    <span class="material-symbols-outlined text-[16px]">logout</span>
+                    Sign out
+                </button>
+            </div>
+        </aside>
+        <!-- Content Area -->
+        <section
+            class="flex-1 flex flex-col h-full bg-gradient-to-br from-white/[0.02] to-transparent relative overflow-hidden">
+            <!-- Content Header -->
+            <header
+                class="flex items-center justify-between px-8 py-6 border-b border-glass-border/50 sticky top-0 z-20 bg-[#161618]/30 backdrop-blur-md">
+                <div>
+                    <h2 class="text-2xl font-bold text-white tracking-tight">General Settings</h2>
+                    <p class="text-text-muted text-sm mt-1">Configure global behavior and application defaults.</p>
+                </div>
+                <!-- Reset Button -->
+                <button
+                    class="text-xs font-medium text-text-muted hover:text-white border border-glass-border hover:border-white/20 bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-md transition-all">
+                    Reset defaults
+                </button>
+            </header>
+            <!-- Scrollable Settings List -->
+            <div class="flex-1 overflow-y-auto p-8 space-y-8">
+                <!-- Section: Startup & Behavior -->
+                <div class="space-y-4">
+                    <h3 class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3 pl-1">Startup &amp;
+                        Behavior</h3>
+                    <!-- Setting Item: Launch at Login -->
+                    <div
+                        class="flex items-center justify-between p-4 rounded-xl border border-glass-border bg-surface hover:bg-surface-hover transition-colors group">
+                        <div class="flex gap-4">
+                            <div
+                                class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-text-muted group-hover:text-white transition-colors">
+                                <span class="material-symbols-outlined">rocket_launch</span>
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <span class="text-sm font-medium text-white">Launch at login</span>
+                                <span class="text-xs text-text-muted">Automatically start GlassOS when you log
+                                    in.</span>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input checked="" class="sr-only peer" type="checkbox" value="" />
+                            <div
+                                class="w-11 h-6 bg-white/10 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
+                            </div>
+                        </label>
+                    </div>
+                    <!-- Setting Item: Focus Lost -->
+                    <div
+                        class="flex items-center justify-between p-4 rounded-xl border border-glass-border bg-surface hover:bg-surface-hover transition-colors group">
+                        <div class="flex gap-4">
+                            <div
+                                class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-text-muted group-hover:text-white transition-colors">
+                                <span class="material-symbols-outlined">visibility_off</span>
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <span class="text-sm font-medium text-white">Hide on focus loss</span>
+                                <span class="text-xs text-text-muted">Fade out Command Center when clicking
+                                    outside.</span>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input class="sr-only peer" type="checkbox" value="" />
+                            <div
+                                class="w-11 h-6 bg-white/10 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <!-- Section: Shortcuts -->
+                <div class="space-y-4">
+                    <h3 class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3 pl-1">Global
+                        Shortcuts</h3>
+                    <!-- Setting Item: Hotkey Recorder -->
+                    <div
+                        class="flex items-center justify-between p-4 rounded-xl border border-glass-border bg-surface hover:bg-surface-hover transition-colors group">
+                        <div class="flex gap-4">
+                            <div
+                                class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-text-muted group-hover:text-white transition-colors">
+                                <span class="material-symbols-outlined">keyboard_command_key</span>
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <span class="text-sm font-medium text-white">Activation Hotkey</span>
+                                <span class="text-xs text-text-muted">The combination to open Command Center.</span>
+                            </div>
+                        </div>
+                        <button
+                            class="relative group/key bg-black/40 hover:bg-black/60 border border-white/10 hover:border-primary/50 rounded-lg px-3 py-1.5 flex items-center gap-2 transition-all shadow-inner">
+                            <div class="flex items-center gap-1">
+                                <kbd
+                                    class="font-mono text-xs text-white bg-white/10 border border-white/10 rounded px-1.5 py-0.5 shadow-sm">⌘</kbd>
+                                <span class="text-white/50 text-xs">+</span>
+                                <kbd
+                                    class="font-mono text-xs text-white bg-white/10 border border-white/10 rounded px-1.5 py-0.5 shadow-sm">Space</kbd>
+                            </div>
+                            <span
+                                class="material-symbols-outlined text-[14px] text-text-muted group-hover/key:text-primary opacity-0 group-hover/key:opacity-100 transition-opacity absolute -right-6">edit</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Section: Clipboard -->
+                <div class="space-y-4">
+                    <h3 class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3 pl-1">Clipboard &amp;
+                        History</h3>
+                    <!-- Setting Item: History Duration -->
+                    <div
+                        class="flex items-center justify-between p-4 rounded-xl border border-glass-border bg-surface hover:bg-surface-hover transition-colors group">
+                        <div class="flex gap-4">
+                            <div
+                                class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-text-muted group-hover:text-white transition-colors">
+                                <span class="material-symbols-outlined">history</span>
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <span class="text-sm font-medium text-white">Retention Period</span>
+                                <span class="text-xs text-text-muted">How long snippets remain in history.</span>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <select
+                                class="appearance-none bg-black/40 hover:bg-black/60 text-white text-sm border border-white/10 hover:border-primary/50 rounded-lg pl-3 pr-8 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all cursor-pointer">
+                                <option>7 Days</option>
+                                <option>30 Days</option>
+                                <option>90 Days</option>
+                                <option>Forever</option>
+                            </select>
+                            <div
+                                class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/50">
+                                <span class="material-symbols-outlined text-[16px]">expand_more</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Setting Item: Sound Effects -->
+                    <div
+                        class="flex items-center justify-between p-4 rounded-xl border border-glass-border bg-surface hover:bg-surface-hover transition-colors group">
+                        <div class="flex gap-4">
+                            <div
+                                class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-text-muted group-hover:text-white transition-colors">
+                                <span class="material-symbols-outlined">volume_up</span>
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <span class="text-sm font-medium text-white">Sound Effects</span>
+                                <span class="text-xs text-text-muted">Play a subtle sound when pasting.</span>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input checked="" class="sr-only peer" type="checkbox" value="" />
+                            <div
+                                class="w-11 h-6 bg-white/10 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <!-- Footer / Version Info (Optional visual balance) -->
+            <div class="px-8 py-4 border-t border-glass-border/50 text-xs text-center text-white/20 bg-black/10">
+                GlassOS Premium Build 2023.10.24-rc
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>

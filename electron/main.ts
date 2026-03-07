@@ -20,8 +20,8 @@ function initStore() {
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 600,
-    height: 450,
+    width: 750,
+    height: 520,
     frame: false,
     transparent: true,
     alwaysOnTop: true,
@@ -32,6 +32,14 @@ function createWindow() {
       sandbox: false,
     },
   });
+
+  // Support for showing over full-screen apps on macOS
+  if (process.platform === 'darwin') {
+    mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+    mainWindow.setAlwaysOnTop(true, 'screen-saver');
+  } else {
+    mainWindow.setAlwaysOnTop(true);
+  }
 
   // Load Vite dev server URL in dev, else load built index.html
   if (process.env.VITE_DEV_SERVER_URL) {
@@ -90,7 +98,7 @@ app.whenReady().then(() => {
     clipboard.writeText(text);
 
     // Wait a tiny bit for the window to fully hide and yield focus
-    const delay = process.platform === 'darwin' ? 500 : 100; // Longer delay on Mac for focus transition
+    const delay = process.platform === 'darwin' ? 200 : 100; // Reduced Mac delay for faster paste transition
     setTimeout(() => {
       console.log('[Electron] Attempting auto-paste simulation...');
       

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>GlassOS Command Center</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Material Symbols -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Theme Configuration -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "glass-bg": "rgba(22, 22, 24, 0.65)",
+                        "glass-border": "rgba(255, 255, 255, 0.08)",
+                        "glass-highlight": "rgba(255, 255, 255, 0.12)",
+                        "accent": "#818CF8", // Indigo 400
+                        "text-main": "#F3F4F6",
+                        "text-muted": "#9CA3AF",
+                        "surface-selected": "rgba(129, 140, 248, 0.15)", // Based on accent
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"],
+                    },
+                    boxShadow: {
+                        "glass-deep": "0 40px 80px -20px rgba(0,0,0,0.7)",
+                    },
+                    backdropBlur: {
+                        "glass": "24px",
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar for sleek look */
+        .glass-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .glass-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .glass-scroll::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+        }
+
+        .glass-scroll::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Gradient Text for subtle branding if needed */
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            background-image: linear-gradient(to right, #818CF8, #C4B5FD);
+        }
+
+        /* Selection Gradient Animation */
+        .selected-item-gradient {
+            background: linear-gradient(90deg, rgba(129, 140, 248, 0.15) 0%, rgba(129, 140, 248, 0.05) 100%);
+        }
+
+        /* Abstract Background Pattern */
+        .desktop-bg {
+            background-color: #0f0f11;
+            background-image:
+                radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+            background-size: cover;
+        }
+    </style>
+</head>
+
+<body
+    class="desktop-bg min-h-screen font-display text-text-main overflow-hidden selection:bg-accent selection:text-white">
+    <!-- Desktop Environment Simulation -->
+    <!-- The Command Center floats over this -->
+    <div class="relative w-full h-screen flex justify-center items-start pt-[20vh]">
+        <!-- GlassOS Command Center Container -->
+        <div
+            class="relative w-[750px] flex flex-col rounded-2xl border border-glass-border bg-glass-bg backdrop-blur-glass shadow-glass-deep overflow-hidden transition-all duration-300 ease-out transform translate-y-0 opacity-100">
+            <!-- 1. Search Header -->
+            <div class="relative flex items-center h-16 px-5 border-b border-glass-border shrink-0">
+                <span class="material-symbols-outlined text-text-muted text-[24px]">search</span>
+                <input autofocus=""
+                    class="w-full bg-transparent border-none text-xl text-text-main placeholder-text-muted focus:ring-0 focus:outline-none ml-3 h-full caret-accent font-normal"
+                    placeholder="Search snippets..." type="text" value="Welcome" />
+                <div class="flex items-center gap-2">
+                    <span
+                        class="text-xs font-mono text-text-muted border border-glass-border rounded px-1.5 py-0.5 bg-white/5">Esc</span>
+                </div>
+            </div>
+            <!-- Main Content Area: Split View -->
+            <div class="flex h-[400px]">
+                <!-- 2. Snippet List (Left) -->
+                <div class="flex-1 flex flex-col overflow-y-auto glass-scroll border-r border-glass-border py-2">
+                    <!-- Selected Item -->
+                    <div
+                        class="group relative flex items-center h-12 px-4 mx-2 rounded-lg cursor-pointer selected-item-gradient transition-all duration-150">
+                        <!-- Active Indicator Border -->
+                        <div
+                            class="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] bg-accent rounded-r-full shadow-[0_0_10px_rgba(129,140,248,0.5)]">
+                        </div>
+                        <div
+                            class="flex items-center justify-center w-8 h-8 rounded-md bg-white/5 mr-3 text-accent shrink-0">
+                            <span class="material-symbols-outlined text-[18px]">mail</span>
+                        </div>
+                        <div class="flex flex-col flex-1 min-w-0">
+                            <span class="text-[14px] font-medium text-white truncate">Welcome Email Template</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span
+                                class="text-xs text-text-muted font-mono hidden group-hover:block transition-opacity">↵</span>
+                            <span
+                                class="text-[10px] text-text-muted/60 font-mono border border-glass-border rounded px-1">TEXT</span>
+                        </div>
+                    </div>
+                    <!-- List Item -->
+                    <div
+                        class="group relative flex items-center h-12 px-4 mx-2 rounded-lg cursor-pointer hover:bg-glass-highlight transition-colors duration-150 text-text-muted hover:text-text-main">
+                        <div class="flex items-center justify-center w-8 h-8 rounded-md bg-transparent mr-3 shrink-0">
+                            <span class="material-symbols-outlined text-[18px]">code</span>
+                        </div>
+                        <div class="flex flex-col flex-1 min-w-0">
+                            <span class="text-[14px] font-medium truncate">React Functional Component</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] text-text-muted/50 font-mono">rfc</span>
+                        </div>
+                    </div>
+                    <!-- List Item -->
+                    <div
+                        class="group relative flex items-center h-12 px-4 mx-2 rounded-lg cursor-pointer hover:bg-glass-highlight transition-colors duration-150 text-text-muted hover:text-text-main">
+                        <div class="flex items-center justify-center w-8 h-8 rounded-md bg-transparent mr-3 shrink-0">
+                            <span class="material-symbols-outlined text-[18px]">database</span>
+                        </div>
+                        <div class="flex flex-col flex-1 min-w-0">
+                            <span class="text-[14px] font-medium truncate">SQL Select All</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] text-text-muted/50 font-mono">sel</span>
+                        </div>
+                    </div>
+                    <!-- List Item -->
+                    <div
+                        class="group relative flex items-center h-12 px-4 mx-2 rounded-lg cursor-pointer hover:bg-glass-highlight transition-colors duration-150 text-text-muted hover:text-text-main">
+                        <div class="flex items-center justify-center w-8 h-8 rounded-md bg-transparent mr-3 shrink-0">
+                            <span class="material-symbols-outlined text-[18px]">confirmation_number</span>
+                        </div>
+                        <div class="flex flex-col flex-1 min-w-0">
+                            <span class="text-[14px] font-medium truncate">JIRA Ticket Format</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] text-text-muted/50 font-mono">jira</span>
+                        </div>
+                    </div>
+                    <!-- List Item -->
+                    <div
+                        class="group relative flex items-center h-12 px-4 mx-2 rounded-lg cursor-pointer hover:bg-glass-highlight transition-colors duration-150 text-text-muted hover:text-text-main">
+                        <div class="flex items-center justify-center w-8 h-8 rounded-md bg-transparent mr-3 shrink-0">
+                            <span class="material-symbols-outlined text-[18px]">calendar_today</span>
+                        </div>
+                        <div class="flex flex-col flex-1 min-w-0">
+                            <span class="text-[14px] font-medium truncate">Date: YYYY-MM-DD</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] text-text-muted/50 font-mono">date</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- 3. Preview Pane (Right) -->
+                <div class="w-[40%] bg-black/20 flex flex-col">
+                    <!-- Preview Header -->
+                    <div class="h-10 px-4 flex items-center justify-between border-b border-glass-border bg-white/5">
+                        <span class="text-[11px] font-medium text-text-muted tracking-wide uppercase">Preview</span>
+                        <div class="flex gap-2">
+                            <button class="text-text-muted hover:text-white transition-colors" title="Copy">
+                                <span class="material-symbols-outlined text-[14px]">content_copy</span>
+                            </button>
+                            <button class="text-text-muted hover:text-white transition-colors" title="Edit">
+                                <span class="material-symbols-outlined text-[14px]">edit</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Code/Content Preview -->
+                    <div class="flex-1 p-4 overflow-y-auto glass-scroll">
+                        <div class="font-mono text-[13px] leading-relaxed text-text-main/90">
+                            <span class="text-accent">Hi</span> <span class="text-yellow-200">{FirstName}</span>,
+                            <br /><br />
+                            Welcome to the team! We are thrilled to have you join us.
+                            <br /><br />
+                            Please review the attached onboarding docs and let me know if you have any questions.
+                            <br /><br />
+                            Best,<br />
+                            <span class="text-emerald-400">{MyName}</span>
+                        </div>
+                    </div>
+                    <!-- Metadata Footer -->
+                    <div class="p-3 border-t border-glass-border bg-white/5">
+                        <div class="flex flex-col gap-1">
+                            <div class="flex justify-between items-center text-[10px] text-text-muted">
+                                <span>Last used</span>
+                                <span>2m ago</span>
+                            </div>
+                            <div class="flex justify-between items-center text-[10px] text-text-muted">
+                                <span>Expansions</span>
+                                <span>1,240</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 4. Footer / Status Bar -->
+            <div
+                class="h-10 border-t border-glass-border bg-glass-bg/50 backdrop-blur-sm flex items-center px-4 justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-1.5">
+                        <span
+                            class="flex items-center justify-center w-5 h-5 rounded bg-white/10 text-[10px] font-mono text-text-main">↵</span>
+                        <span class="text-[11px] text-text-muted">Paste</span>
+                    </div>
+                    <div class="w-px h-3 bg-glass-border"></div>
+                    <div class="flex items-center gap-1.5">
+                        <span
+                            class="flex items-center justify-center h-5 px-1.5 rounded bg-white/10 text-[10px] font-mono text-text-main">⌘K</span>
+                        <span class="text-[11px] text-text-muted">Actions</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-[11px] text-text-muted">GlassOS Premium</span>
+                    <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

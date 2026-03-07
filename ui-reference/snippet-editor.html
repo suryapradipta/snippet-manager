@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>GlassOS Snippet Editor</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Icons -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0a1af5",
+                        "primary-content": "#ffffff",
+                        "glass-bg": "rgba(22, 22, 24, 0.75)",
+                        "glass-border": "rgba(255, 255, 255, 0.08)",
+                        "glass-surface": "rgba(255, 255, 255, 0.05)",
+                        "glass-highlight": "rgba(255, 255, 255, 0.12)",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101122",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "2xl": "2rem",
+                        "full": "9999px"
+                    },
+                    backdropBlur: {
+                        "xs": "2px",
+                        "md": "12px",
+                        "xl": "24px"
+                    },
+                    boxShadow: {
+                        "glass": "0 24px 48px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.1)",
+                        "glass-sm": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                        "glow": "0 0 20px -5px rgba(10, 26, 245, 0.5)"
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for the editor */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Syntax Highlighting Simulation */
+        .token-keyword {
+            color: #c678dd;
+        }
+
+        /* Purple */
+        .token-string {
+            color: #98c379;
+        }
+
+        /* Green */
+        .token-variable {
+            color: #e06c75;
+        }
+
+        /* Red */
+        .token-function {
+            color: #61afef;
+        }
+
+        /* Blue */
+        .token-comment {
+            color: #5c6370;
+            font-style: italic;
+        }
+
+        /* Grey */
+    </style>
+</head>
+
+<body
+    class="bg-background-dark min-h-screen flex items-center justify-center font-display overflow-hidden relative selection:bg-primary/30 selection:text-white">
+    <!-- Abstract Background Wallpaper Simulation -->
+    <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-primary/20 blur-[120px]"
+            data-alt="Soft blue abstract gradient blob in top left"></div>
+        <div class="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-600/10 blur-[100px]"
+            data-alt="Soft purple abstract gradient blob in bottom right"></div>
+        <!-- Wallpaper Image -->
+        <img class="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-overlay"
+            data-alt="Abstract dark fluid waves wallpaper"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhAG4GOCxAI_eK78rJx2tezJWRD9aK-QEdx7DII-byCa84W5XkDzjcIIrNJz9C4suAR8Nkal4q5Z6e4ZJg1mQy20G4KJycHR3HvRwea35npKYfZ5F-e1YYErM0lyOvAESQH-q4E21Jd6NzAOiRpZJhNToW4Zj1v5hKRYkevlizZ_s-xVRdbl1WwGQx2mAXKQ_xuzRHsuJSWDuXW1CnwAEGeAcmyBjReq47ZlPxT2TWUGzrb1Ux52ieoEl9pHKzYVy2n1HGDt7jSzyd" />
+    </div>
+    <!-- Main Container - Command Center Simulation (Background Context) -->
+    <!-- This represents the layer behind the modal to show depth -->
+    <div class="relative z-10 w-full max-w-[800px] flex flex-col items-center">
+        <!-- Snippet Editor Modal -->
+        <!-- "Sliding up" state simulated by position -->
+        <div
+            class="w-full bg-glass-bg backdrop-blur-xl border border-glass-border shadow-glass rounded-2xl overflow-hidden flex flex-col transition-all duration-300 transform translate-y-0 opacity-100">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-6 py-5 border-b border-glass-border">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
+                        <span class="material-symbols-outlined text-[20px]">edit_square</span>
+                    </div>
+                    <h2 class="text-white text-lg font-semibold tracking-tight">Edit Snippet</h2>
+                </div>
+                <button class="text-slate-400 hover:text-white transition-colors p-1 rounded-md hover:bg-white/5">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <!-- Body Content -->
+            <div class="p-6 flex flex-col gap-5">
+                <!-- Input Row -->
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <!-- Trigger Input -->
+                    <div class="flex-1 sm:flex-[0.4] flex flex-col gap-2">
+                        <label class="text-xs font-medium text-slate-400 uppercase tracking-wider ml-1">Trigger</label>
+                        <div class="relative group">
+                            <div
+                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500 group-focus-within:text-primary transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">bolt</span>
+                            </div>
+                            <input
+                                class="w-full bg-glass-surface border border-glass-border rounded-lg pl-10 pr-3 py-2.5 text-sm font-mono text-white placeholder-slate-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-sm"
+                                placeholder="e.g. !trig" type="text" value="!welcome" />
+                        </div>
+                    </div>
+                    <!-- Label Input -->
+                    <div class="flex-1 flex flex-col gap-2">
+                        <label class="text-xs font-medium text-slate-400 uppercase tracking-wider ml-1">Label</label>
+                        <div class="relative group">
+                            <div
+                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500 group-focus-within:text-primary transition-colors">
+                                <span class="material-symbols-outlined text-[18px]">label</span>
+                            </div>
+                            <input
+                                class="w-full bg-glass-surface border border-glass-border rounded-lg pl-10 pr-3 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-sm"
+                                placeholder="Snippet Name" type="text" value="Welcome Email Client" />
+                        </div>
+                    </div>
+                </div>
+                <!-- Editor Area -->
+                <div class="flex flex-col gap-2 relative group/editor">
+                    <div class="flex justify-between items-end px-1">
+                        <label class="text-xs font-medium text-slate-400 uppercase tracking-wider">Content</label>
+                        <span class="text-[10px] text-slate-500 font-mono">Markdown</span>
+                    </div>
+                    <div
+                        class="relative w-full min-h-[240px] bg-black/30 border border-glass-border rounded-lg overflow-hidden flex focus-within:ring-1 focus-within:ring-primary/50 focus-within:border-primary/50 transition-all">
+                        <!-- Line Numbers -->
+                        <div
+                            class="w-10 bg-white/5 border-r border-white/5 py-4 flex flex-col items-center text-xs font-mono text-slate-600 select-none">
+                            <span>1</span>
+                            <span>2</span>
+                            <span>3</span>
+                            <span>4</span>
+                            <span>5</span>
+                            <span>6</span>
+                            <span>7</span>
+                        </div>
+                        <!-- Text Area (Simulated with contenteditable look for richness) -->
+                        <div class="flex-1 p-4 font-mono text-[13px] leading-6 text-slate-300 overflow-y-auto custom-scrollbar outline-none"
+                            contenteditable="true" spellcheck="false">
+                            <p>Hi <span class="token-variable">{clipboard}</span>,</p>
+                            <p><br /></p>
+                            <p>Thanks for reaching out to us today <span class="token-variable">{date}</span>.</p>
+                            <p>We've received your inquiry regarding the <span class="token-string">"Project
+                                    Alpha"</span> timeline.</p>
+                            <p><br /></p>
+                            <p>Here are the next steps:</p>
+                            <p>1. Review the attached document.</p>
+                            <p>2. Reply with your availability.</p>
+                            <p><br /></p>
+                            <p>Best regards,<br />The Team</p>
+                        </div>
+                        <!-- Floating Variable Chips (Inside editor for quick access) -->
+                        <div class="absolute bottom-3 right-3 flex gap-2 transition-opacity opacity-100">
+                            <button
+                                class="flex items-center gap-1.5 px-2.5 py-1 bg-white/5 hover:bg-white/10 border border-white/5 rounded-md backdrop-blur-md transition-all group/chip">
+                                <span
+                                    class="material-symbols-outlined text-[14px] text-primary group-hover/chip:text-white transition-colors">content_paste</span>
+                                <span
+                                    class="text-[11px] font-mono text-slate-400 group-hover/chip:text-white transition-colors">{clipboard}</span>
+                            </button>
+                            <button
+                                class="flex items-center gap-1.5 px-2.5 py-1 bg-white/5 hover:bg-white/10 border border-white/5 rounded-md backdrop-blur-md transition-all group/chip">
+                                <span
+                                    class="material-symbols-outlined text-[14px] text-primary group-hover/chip:text-white transition-colors">calendar_today</span>
+                                <span
+                                    class="text-[11px] font-mono text-slate-400 group-hover/chip:text-white transition-colors">{date}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Helper Variables Row -->
+                <div class="flex flex-wrap gap-2 items-center px-1">
+                    <span class="text-xs text-slate-500 mr-1">Insert variable:</span>
+                    <button
+                        class="flex items-center gap-1.5 px-2.5 py-1.5 bg-glass-surface hover:bg-glass-highlight border border-glass-border rounded-full transition-all group">
+                        <span
+                            class="material-symbols-outlined text-[14px] text-primary opacity-80 group-hover:opacity-100">schedule</span>
+                        <span class="text-xs font-medium text-slate-300 group-hover:text-white">{time}</span>
+                    </button>
+                    <button
+                        class="flex items-center gap-1.5 px-2.5 py-1.5 bg-glass-surface hover:bg-glass-highlight border border-glass-border rounded-full transition-all group">
+                        <span
+                            class="material-symbols-outlined text-[14px] text-primary opacity-80 group-hover:opacity-100">ads_click</span>
+                        <span class="text-xs font-medium text-slate-300 group-hover:text-white">{cursor}</span>
+                    </button>
+                    <button
+                        class="flex items-center gap-1.5 px-2.5 py-1.5 bg-glass-surface hover:bg-glass-highlight border border-glass-border rounded-full transition-all group">
+                        <span
+                            class="material-symbols-outlined text-[14px] text-primary opacity-80 group-hover:opacity-100">input</span>
+                        <span class="text-xs font-medium text-slate-300 group-hover:text-white">{input}</span>
+                    </button>
+                </div>
+            </div>
+            <!-- Footer -->
+            <div
+                class="px-6 py-5 bg-black/20 border-t border-glass-border flex justify-between items-center backdrop-blur-md">
+                <div class="flex items-center gap-2">
+                    <div class="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                    <span class="text-xs text-slate-400">Changes saved</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button
+                        class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                        Cancel
+                    </button>
+                    <button
+                        class="flex items-center gap-2 px-5 py-2 bg-primary hover:bg-blue-600 text-white text-sm font-medium rounded-lg shadow-glow transition-all active:scale-95">
+                        <span>Save Snippet</span>
+                        <div
+                            class="flex items-center gap-0.5 ml-1 px-1.5 py-0.5 bg-white/20 rounded text-[10px] font-mono leading-none border border-white/10">
+                            <span>⌘</span>
+                            <span>↵</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

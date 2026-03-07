@@ -14,8 +14,8 @@ function initStore() {
 }
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 600,
-    height: 450,
+    width: 750,
+    height: 520,
     frame: false,
     transparent: true,
     alwaysOnTop: true,
@@ -26,6 +26,12 @@ function createWindow() {
       sandbox: false
     }
   });
+  if (process.platform === "darwin") {
+    mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+    mainWindow.setAlwaysOnTop(true, "screen-saver");
+  } else {
+    mainWindow.setAlwaysOnTop(true);
+  }
   if (process.env.VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
   } else {
@@ -68,7 +74,7 @@ app.whenReady().then(() => {
       }
     }
     clipboard.writeText(text);
-    const delay = process.platform === "darwin" ? 500 : 100;
+    const delay = process.platform === "darwin" ? 200 : 100;
     setTimeout(() => {
       console.log("[Electron] Attempting auto-paste simulation...");
       if (process.platform === "darwin") {

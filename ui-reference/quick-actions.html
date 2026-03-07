@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>GlassOS - Quick Actions</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#818CF8", // Indigo 400 as per PRD
+                        "glass-bg": "rgba(22, 22, 24, 0.65)",
+                        "glass-border": "rgba(255, 255, 255, 0.08)",
+                        "glass-highlight": "rgba(255, 255, 255, 0.12)",
+                        "text-main": "#F3F4F6",
+                        "text-muted": "#9CA3AF",
+                        "danger": "#F43F5E", // Rose 500 for destructive actions
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"],
+                    },
+                    boxShadow: {
+                        "glass": "0 40px 80px -20px rgba(0,0,0,0.6)",
+                    },
+                    backgroundImage: {
+                        "selected-gradient": "linear-gradient(90deg, rgba(129, 140, 248, 0.15) 0%, rgba(129, 140, 248, 0.05) 100%)",
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            /* Abstract gradient background to show off the glass effect */
+            background-image: radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+            background-color: #111118;
+            background-attachment: fixed;
+            height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 20vh;
+        }
+
+        /* Custom Scrollbar for the glass look */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body class="font-display antialiased selection:bg-primary/30 selection:text-white">
+    <!-- Glass Container -->
+    <div aria-label="Quick Actions" aria-modal="true"
+        class="w-[750px] max-w-[95vw] rounded-2xl border border-glass-border bg-glass-bg backdrop-blur-2xl shadow-glass overflow-hidden flex flex-col relative"
+        role="dialog">
+        <!-- Header / Breadcrumbs -->
+        <div class="px-6 py-4 border-b border-glass-border flex items-center gap-3">
+            <span class="material-symbols-outlined text-text-muted text-[20px]">
+                terminal
+            </span>
+            <div class="flex items-center gap-2 text-sm">
+                <span class="text-text-muted">Home</span>
+                <span class="text-glass-border">/</span>
+                <span class="text-white font-medium">Welcome Email Template</span>
+                <span
+                    class="px-2 py-0.5 rounded bg-primary/20 text-primary text-[10px] font-bold tracking-wide uppercase ml-2">Snippet</span>
+            </div>
+        </div>
+        <!-- Action List -->
+        <div class="p-4 flex flex-col gap-1 max-h-[400px] overflow-y-auto">
+            <!-- Item 1: Copy (Selected State) -->
+            <button
+                class="group flex items-center justify-between w-full px-4 py-3 rounded-lg border-l-2 border-primary bg-selected-gradient transition-all duration-75 outline-none">
+                <div class="flex items-center gap-4">
+                    <span class="material-symbols-outlined text-white" style="font-size: 20px;">
+                        content_copy
+                    </span>
+                    <span class="text-white font-medium text-[15px]">Copy to Clipboard</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-xs text-primary font-mono bg-primary/10 px-2 py-1 rounded">↵</span>
+                </div>
+            </button>
+            <!-- Item 2: Edit -->
+            <button
+                class="group flex items-center justify-between w-full px-4 py-3 rounded-lg border-l-2 border-transparent hover:bg-glass-highlight transition-all duration-75 outline-none">
+                <div class="flex items-center gap-4">
+                    <span class="material-symbols-outlined text-text-muted group-hover:text-white transition-colors"
+                        style="font-size: 20px;">
+                        edit
+                    </span>
+                    <span class="text-text-main group-hover:text-white font-medium text-[15px] transition-colors">Edit
+                        Snippet</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-xs text-text-muted font-mono bg-glass-border px-2 py-1 rounded">E</span>
+                </div>
+            </button>
+            <!-- Item 3: Duplicate -->
+            <button
+                class="group flex items-center justify-between w-full px-4 py-3 rounded-lg border-l-2 border-transparent hover:bg-glass-highlight transition-all duration-75 outline-none">
+                <div class="flex items-center gap-4">
+                    <span class="material-symbols-outlined text-text-muted group-hover:text-white transition-colors"
+                        style="font-size: 20px;">
+                        file_copy
+                    </span>
+                    <span
+                        class="text-text-main group-hover:text-white font-medium text-[15px] transition-colors">Duplicate</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-xs text-text-muted font-mono bg-glass-border px-2 py-1 rounded">⌘ D</span>
+                </div>
+            </button>
+            <!-- Item 4: Pin to Top -->
+            <button
+                class="group flex items-center justify-between w-full px-4 py-3 rounded-lg border-l-2 border-transparent hover:bg-glass-highlight transition-all duration-75 outline-none">
+                <div class="flex items-center gap-4">
+                    <span class="material-symbols-outlined text-text-muted group-hover:text-white transition-colors"
+                        style="font-size: 20px;">
+                        push_pin
+                    </span>
+                    <span class="text-text-main group-hover:text-white font-medium text-[15px] transition-colors">Pin to
+                        Top</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-xs text-text-muted font-mono bg-glass-border px-2 py-1 rounded">P</span>
+                </div>
+            </button>
+            <!-- Divider -->
+            <div class="h-px bg-glass-border my-1 mx-2"></div>
+            <!-- Item 5: Delete (Destructive) -->
+            <button
+                class="group flex items-center justify-between w-full px-4 py-3 rounded-lg border-l-2 border-transparent hover:bg-danger/10 transition-all duration-75 outline-none">
+                <div class="flex items-center gap-4">
+                    <span class="material-symbols-outlined text-danger group-hover:text-red-400 transition-colors"
+                        style="font-size: 20px;">
+                        delete
+                    </span>
+                    <span
+                        class="text-danger group-hover:text-red-400 font-medium text-[15px] transition-colors">Delete</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-xs text-danger/70 font-mono bg-danger/10 px-2 py-1 rounded">⌫</span>
+                </div>
+            </button>
+        </div>
+        <!-- Footer / Shortcuts -->
+        <div
+            class="px-6 py-3 bg-glass-border/30 border-t border-glass-border flex items-center justify-between text-xs">
+            <div class="flex items-center gap-4 text-text-muted">
+                <div class="flex items-center gap-1.5">
+                    <kbd
+                        class="font-mono bg-glass-border px-1.5 py-0.5 rounded text-[10px] min-w-[20px] text-center">↑</kbd>
+                    <kbd
+                        class="font-mono bg-glass-border px-1.5 py-0.5 rounded text-[10px] min-w-[20px] text-center">↓</kbd>
+                    <span>Navigate</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <kbd
+                        class="font-mono bg-glass-border px-1.5 py-0.5 rounded text-[10px] min-w-[20px] text-center">↵</kbd>
+                    <span>Select</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 text-text-muted">
+                <div class="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer">
+                    <kbd class="font-mono bg-glass-border px-1.5 py-0.5 rounded text-[10px]">Esc</kbd>
+                    <span>Close</span>
+                </div>
+                <div class="h-3 w-px bg-glass-border"></div>
+                <div class="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer">
+                    <kbd class="font-mono bg-glass-border px-1.5 py-0.5 rounded text-[10px]">⌫</kbd>
+                    <span>Back</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

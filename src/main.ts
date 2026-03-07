@@ -22,24 +22,35 @@ declare global {
 let snippets: Snippet[] = [];
 let filteredSnippets: Snippet[] = [];
 let selectedIndex = 0;
+let editingSnippetId: string | null = null;
+let isModalOpen = false;
 
 // DOM Elements
+const appContainer = document.getElementById('app') as HTMLElement;
 const searchInput = document.getElementById('search-input') as HTMLInputElement;
 const resultsList = document.getElementById('results-list') as HTMLUListElement;
-const addForm = document.getElementById('add-form') as HTMLDivElement;
+
+const previewPane = document.getElementById('preview-pane') as HTMLElement;
+const previewEmpty = document.getElementById('preview-empty') as HTMLElement;
+const previewContent = document.getElementById('preview-content') as HTMLElement;
+
+const modalOverlay = document.getElementById('modal-overlay') as HTMLElement;
+const modalTitle = document.getElementById('modal-title') as HTMLElement;
 const addTitle = document.getElementById('add-title') as HTMLInputElement;
 const addContent = document.getElementById('add-content') as HTMLTextAreaElement;
-const mainFooter = document.getElementById('main-footer') as HTMLDivElement;
-const addFooter = document.getElementById('add-footer') as HTMLDivElement;
+
 const btnSave = document.getElementById('btn-save') as HTMLButtonElement;
 const btnCancel = document.getElementById('btn-cancel') as HTMLButtonElement;
+const btnCloseModal = document.getElementById('btn-close-modal') as HTMLButtonElement;
 
-let isAdding = false;
+const btnCopyPreview = document.getElementById('btn-copy-preview') as HTMLButtonElement;
+const btnEditPreview = document.getElementById('btn-edit-preview') as HTMLButtonElement;
+const btnDeletePreview = document.getElementById('btn-delete-preview') as HTMLButtonElement;
 
 async function init() {
-  console.log('[App] Initializing...');
+  console.log('[App] Initializing GlassOS...');
   if (!window.electronAPI) {
-    resultsList.innerHTML = '<li class="snippet-item" style="text-align: center; color: #ff5555; pointer-events: none;">Critical Error: Electron API not found. Preload script might have failed.</li>';
+    resultsList.innerHTML = '<li class="snippet-item" style="text-align: center; color: #ff5555; pointer-events: none;">Critical Error: Electron API not found.</li>';
     return;
   }
   
@@ -51,91 +62,11 @@ async function init() {
     snippets = [];
   }
 
-  // Seed with example if empty (REMOVED)
-  
   filterSnippets('');
-
-  // Focus input automatically
   searchInput.focus();
 }
 
-btnSave.onclick = () => saveNewSnippet();
-btnCancel.onclick = () => toggleAddForm();
-
-async function deleteSnippet(id: string, event?: MouseEvent) {
-  if (event) {
-    event.stopPropagation();
-  }
-
-  if (!confirm('Are you sure you want to delete this snippet?')) {
-    return;
-  }
-
-  snippets = snippets.filter(s => s.id !== id);
-  await window.electronAPI.saveSnippets(snippets);
-  filterSnippets(searchInput.value);
-}
-
-function renderResults() {
-  resultsList.innerHTML = '';
-
-  if (filteredSnippets.length === 0) {
-    resultsList.innerHTML = '<li class="snippet-item" style="text-align: center; color: var(--text-secondary); pointer-events: none;">No snippets found. Press Cmd+Ctrl+N to add.</li>';
-    return;
-  }
-
-  filteredSnippets.forEach((snippet, index) => {
-    const li = document.createElement('li');
-    li.className = `snippet-item ${index === selectedIndex ? 'selected' : ''}`;
-
-    // We handle click
-    li.onclick = () => {
-      selectedIndex = index;
-      renderResults();
-      triggerPaste();
-    };
-
-    const titleDiv = document.createElement('div');
-    titleDiv.className = 'snippet-title';
-    titleDiv.textContent = snippet.title;
-
-    const deleteBtn = document.createElement('div');
-    deleteBtn.className = 'delete-btn';
-    deleteBtn.innerHTML = `
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="3 6 5 6 21 6"></polyline>
-        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-        <line x1="10" y1="11" x2="10" y2="17"></line>
-        <line x1="14" y1="11" x2="14" y2="17"></line>
-      </svg>
-    `;
-    deleteBtn.onclick = (e) => {
-      e.stopPropagation();
-      deleteSnippet(snippet.id, e);
-    };
-
-    const headerDiv = document.createElement('div');
-    headerDiv.className = 'snippet-header';
-    headerDiv.appendChild(titleDiv);
-    headerDiv.appendChild(deleteBtn);
-
-    const previewDiv = document.createElement('div');
-    previewDiv.className = 'snippet-preview';
-    // Single line preview mapping newlines to spaces
-    previewDiv.textContent = snippet.content.replace(/\n/g, ' ↵ ');
-
-    li.appendChild(headerDiv);
-    li.appendChild(previewDiv);
-    resultsList.appendChild(li);
-  });
-
-  // Ensure selected item is scrolled into view
-  const selectedEl = resultsList.querySelector('.selected');
-  if (selectedEl) {
-    selectedEl.scrollIntoView({ block: 'nearest' });
-  }
-}
-
+// Logic: Filtering & Rendering
 function filterSnippets(query: string) {
   if (!query.trim()) {
     filteredSnippets = [...snippets].sort((a, b) => b.createdAt - a.createdAt);
@@ -145,17 +76,167 @@ function filterSnippets(query: string) {
       s.title.toLowerCase().includes(q) || s.content.toLowerCase().includes(q)
     ).sort((a, b) => b.createdAt - a.createdAt);
   }
-  selectedIndex = 0;
+  
+  if (selectedIndex >= filteredSnippets.length) {
+    selectedIndex = Math.max(0, filteredSnippets.length - 1);
+  } else if (filteredSnippets.length > 0 && selectedIndex < 0) {
+    selectedIndex = 0;
+  }
+
   renderResults();
+  updatePreview();
+}
+
+function renderResults() {
+  resultsList.innerHTML = '';
+
+  if (filteredSnippets.length === 0) {
+    resultsList.innerHTML = '<li class="snippet-item" style="text-align: center; color: var(--text-muted); pointer-events: none; opacity: 0.5; padding: 20px;">No snippets found.</li>';
+    return;
+  }
+
+  filteredSnippets.forEach((snippet, index) => {
+    const li = document.createElement('li');
+    li.className = `snippet-item ${index === selectedIndex ? 'selected' : ''}`;
+
+    li.onclick = () => {
+      selectedIndex = index;
+      renderResults();
+      updatePreview();
+    };
+
+    const iconDiv = document.createElement('div');
+    iconDiv.className = 'snippet-item-icon';
+    iconDiv.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px;">code</span>';
+
+    const infoDiv = document.createElement('div');
+    infoDiv.className = 'snippet-item-info';
+    
+    const titleSpan = document.createElement('span');
+    titleSpan.className = 'snippet-title';
+    titleSpan.textContent = snippet.title;
+    
+    infoDiv.appendChild(titleSpan);
+
+    const rightDiv = document.createElement('div');
+    rightDiv.className = 'snippet-item-right';
+
+    const deleteBtn = document.createElement('div');
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 16px;">delete</span>';
+    deleteBtn.onclick = (e) => {
+      e.stopPropagation();
+      deleteSnippet(snippet.id);
+    };
+
+    const tagSpan = document.createElement('span');
+    tagSpan.className = 'snippet-item-tag';
+    tagSpan.textContent = 'SNIP';
+
+    rightDiv.appendChild(deleteBtn);
+    rightDiv.appendChild(tagSpan);
+
+    li.appendChild(iconDiv);
+    li.appendChild(infoDiv);
+    li.appendChild(rightDiv);
+    resultsList.appendChild(li);
+  });
+
+  const selectedEl = resultsList.querySelector('.selected');
+  if (selectedEl) {
+    selectedEl.scrollIntoView({ block: 'nearest' });
+  }
+}
+
+function updatePreview() {
+  if (filteredSnippets.length > 0 && selectedIndex >= 0) {
+    const selected = filteredSnippets[selectedIndex];
+    previewPane.classList.remove('hidden');
+    previewEmpty.classList.add('hidden');
+    previewContent.textContent = selected.content;
+  } else {
+    previewPane.classList.add('hidden');
+    previewEmpty.classList.remove('hidden');
+    previewContent.textContent = '';
+  }
+}
+
+// Logic: Actions
+async function deleteSnippet(id: string) {
+  if (!confirm('Are you sure you want to delete this snippet?')) {
+    return;
+  }
+
+  snippets = snippets.filter(s => s.id !== id);
+  await window.electronAPI.saveSnippets(snippets);
+  filterSnippets(searchInput.value);
 }
 
 async function triggerPaste() {
-  console.log('[App] triggerPaste called, filteredSnippets length:', filteredSnippets.length);
-  if (filteredSnippets.length > 0) {
+  if (filteredSnippets.length > 0 && selectedIndex >= 0) {
     const selected = filteredSnippets[selectedIndex];
-    console.log('[App] Sending paste IPC for snippet:', selected.title);
     await window.electronAPI.pasteSnippet(selected.content);
   }
+}
+
+function openModal(snippetId: string | null = null) {
+  const snippet = snippetId ? snippets.find(s => s.id === snippetId) : null;
+  
+  editingSnippetId = snippetId;
+  isModalOpen = true;
+  appContainer.classList.add('modal-open');
+  modalOverlay.classList.remove('hidden');
+  
+  if (snippet) {
+    modalTitle.textContent = 'Edit Snippet';
+    addTitle.value = snippet.title;
+    addContent.value = snippet.content;
+  } else {
+    modalTitle.textContent = 'Create Snippet';
+    addTitle.value = searchInput.value;
+    addContent.value = '';
+  }
+  
+  setTimeout(() => addTitle.focus(), 50);
+}
+
+function closeModal() {
+  isModalOpen = false;
+  editingSnippetId = null;
+  appContainer.classList.remove('modal-open');
+  modalOverlay.classList.add('hidden');
+  searchInput.focus();
+}
+
+async function handleSave() {
+  const title = addTitle.value.trim();
+  const content = addContent.value.trim();
+  
+  if (!title || !content) {
+    alert('Title and content are required.');
+    return;
+  }
+
+  if (editingSnippetId) {
+    snippets = snippets.map(s => s.id === editingSnippetId ? {
+      ...s,
+      title,
+      content
+    } : s);
+  } else {
+    const newSnippet: Snippet = {
+      id: Math.random().toString(36).substring(7),
+      title,
+      content,
+      createdAt: Date.now()
+    };
+    snippets.push(newSnippet);
+    searchInput.value = '';
+  }
+
+  await window.electronAPI.saveSnippets(snippets);
+  filterSnippets(searchInput.value);
+  closeModal();
 }
 
 // Event Listeners
@@ -164,98 +245,66 @@ searchInput.addEventListener('input', (e) => {
   filterSnippets(target.value);
 });
 
-async function toggleAddForm() {
-  isAdding = !isAdding;
-  if (isAdding) {
-    addForm.classList.remove('hidden');
-    resultsList.classList.add('hidden');
-    searchInput.disabled = true;
-    addTitle.focus();
-    addTitle.value = searchInput.value; // pre-fill with search term if any
-    addContent.value = '';
-    mainFooter.classList.add('hidden');
-    addFooter.classList.remove('hidden');
-  } else {
-    addForm.classList.add('hidden');
-    resultsList.classList.remove('hidden');
-    searchInput.disabled = false;
-    searchInput.focus();
-    mainFooter.classList.remove('hidden');
-    addFooter.classList.add('hidden');
-  }
-}
+btnSave.onclick = handleSave;
+btnCancel.onclick = closeModal;
+btnCloseModal.onclick = closeModal;
 
-async function saveNewSnippet() {
-  if (!addTitle.value.trim() || !addContent.value.trim()) {
-    toggleAddForm();
-    return;
-  }
+btnCopyPreview.onclick = () => {
+  if (filteredSnippets[selectedIndex]) triggerPaste();
+};
 
-  const newSnippet: Snippet = {
-    id: Math.random().toString(36).substring(7),
-    title: addTitle.value.trim(),
-    content: addContent.value,
-    createdAt: Date.now()
-  };
+btnEditPreview.onclick = () => {
+  if (filteredSnippets[selectedIndex]) openModal(filteredSnippets[selectedIndex].id);
+};
 
-  snippets.push(newSnippet);
-  await window.electronAPI.saveSnippets(snippets);
-  
-  // Clear search input so the new snippet is visible at the top of the list
-  searchInput.value = '';
-  filterSnippets('');
-  
-  toggleAddForm(); // Close form
-}
+btnDeletePreview.onclick = () => {
+  if (filteredSnippets[selectedIndex]) deleteSnippet(filteredSnippets[selectedIndex].id);
+};
 
 document.addEventListener('keydown', (e) => {
-  // Toggle form trigger: Cmd+N or Ctrl+N
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'n') {
     e.preventDefault();
-    toggleAddForm();
+    openModal();
     return;
   }
 
-  if (isAdding) {
+  if (isModalOpen) {
     if (e.key === 'Escape') {
+      closeModal();
+    } else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
-      toggleAddForm();
-    } else if (e.key === 'Enter') {
-      if (e.shiftKey) {
-        // Shift+Enter allows newline in textarea, do nothing special
-        return;
-      } else {
-        // Simple Enter to save snippet
-        e.preventDefault();
-        saveNewSnippet();
-      }
+      handleSave();
     }
     return;
   }
 
-  // Normal mode
   if (e.key === 'ArrowDown') {
     e.preventDefault();
     if (selectedIndex < filteredSnippets.length - 1) {
       selectedIndex++;
       renderResults();
+      updatePreview();
     }
   } else if (e.key === 'ArrowUp') {
     e.preventDefault();
     if (selectedIndex > 0) {
       selectedIndex--;
       renderResults();
+      updatePreview();
     }
   } else if (e.key === 'Enter') {
     e.preventDefault();
     triggerPaste();
   } else if (e.key === 'Backspace' || e.key === 'Delete') {
-    if (filteredSnippets.length > 0) {
+    if (filteredSnippets.length > 0 && selectedIndex >= 0) {
       e.preventDefault();
       deleteSnippet(filteredSnippets[selectedIndex].id);
     }
   } else if (e.key === 'Escape') {
-    // Hide window logic could optionally go here, but blur handles it
+    if (searchInput.value) {
+      searchInput.value = '';
+      filterSnippets('');
+    }
   }
 });
 
