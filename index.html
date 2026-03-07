@@ -22,43 +22,13 @@
       </div>
     </header>
 
-    <!-- Main Content Area: Split View -->
+    <!-- Main Content Area: List View -->
     <main class="main-content">
-      <!-- Snippet List (Left) -->
-      <aside class="sidebar">
+      <div class="sidebar">
         <ul id="results-list" class="glass-scroll">
           <!-- Snippets injected here -->
         </ul>
-      </aside>
-
-      <!-- Preview Pane (Right) -->
-      <section id="preview-pane" class="preview-pane hidden">
-        <header class="preview-header">
-          <span class="preview-label">Preview</span>
-          <div class="preview-actions">
-            <button id="btn-copy-preview" title="Copy Content">
-              <span class="material-symbols-outlined">content_copy</span>
-            </button>
-            <button id="btn-edit-preview" title="Edit Snippet">
-              <span class="material-symbols-outlined">edit</span>
-            </button>
-            <button id="btn-delete-preview" title="Delete Snippet">
-              <span class="material-symbols-outlined">delete</span>
-            </button>
-          </div>
-        </header>
-        <div id="preview-content" class="preview-body glass-scroll">
-          <!-- Content injected here -->
-        </div>
-      </section>
-
-      <!-- Empty State for Preview -->
-      <section id="preview-empty" class="preview-pane empty-state">
-        <div class="empty-message">
-          <span class="material-symbols-outlined">description</span>
-          <p>Select a snippet to preview</p>
-        </div>
-      </section>
+      </div>
     </main>
 
     <!-- Footer / Status Bar -->
@@ -76,18 +46,21 @@
         <div class="divider"></div>
         <div class="shortcut-item">
           <kbd>⌘N</kbd>
-          <span>New Snippet</span>
+          <span>New</span>
+        </div>
+        <div class="divider"></div>
+        <div class="shortcut-item">
+          <kbd>Delete</kbd>
+          <span>Delete</span>
         </div>
       </div>
       <div class="footer-right">
         <span class="status-dot"></span>
-        <span class="status-text">GlassOS Reader</span>
       </div>
     </footer>
 
-    <!-- Modals moved inside #app for integrated layout -->
+    <!-- Modals -->
     <div id="modal-overlay" class="modal-overlay hidden">
-      <!-- Create/Edit Modal -->
       <div id="editor-modal" class="modal glass-panel">
         <header class="modal-header">
           <div class="header-title">
@@ -103,7 +76,6 @@
           <div class="form-group">
             <label>Label / Title</label>
             <div class="input-with-icon">
-              <span class="material-symbols-outlined input-icon">label</span>
               <input id="add-title" type="text" placeholder="e.g. Welcome Message" autocomplete="off" />
             </div>
           </div>

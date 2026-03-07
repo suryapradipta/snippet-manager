@@ -14,6 +14,7 @@ declare global {
       getSnippets: () => Promise<Snippet[]>;
       saveSnippets: (snippets: Snippet[]) => Promise<void>;
       pasteSnippet: (text: string) => Promise<void>;
+      hideWindow: () => Promise<void>;
     }
   }
 }
@@ -30,10 +31,6 @@ const appContainer = document.getElementById('app') as HTMLElement;
 const searchInput = document.getElementById('search-input') as HTMLInputElement;
 const resultsList = document.getElementById('results-list') as HTMLUListElement;
 
-const previewPane = document.getElementById('preview-pane') as HTMLElement;
-const previewEmpty = document.getElementById('preview-empty') as HTMLElement;
-const previewContent = document.getElementById('preview-content') as HTMLElement;
-
 const modalOverlay = document.getElementById('modal-overlay') as HTMLElement;
 const modalTitle = document.getElementById('modal-title') as HTMLElement;
 const addTitle = document.getElementById('add-title') as HTMLInputElement;
@@ -43,12 +40,8 @@ const btnSave = document.getElementById('btn-save') as HTMLButtonElement;
 const btnCancel = document.getElementById('btn-cancel') as HTMLButtonElement;
 const btnCloseModal = document.getElementById('btn-close-modal') as HTMLButtonElement;
 
-const btnCopyPreview = document.getElementById('btn-copy-preview') as HTMLButtonElement;
-const btnEditPreview = document.getElementById('btn-edit-preview') as HTMLButtonElement;
-const btnDeletePreview = document.getElementById('btn-delete-preview') as HTMLButtonElement;
-
 async function init() {
-  console.log('[App] Initializing GlassOS...');
+  console.log('[App] Initializing App...');
   if (!window.electronAPI) {
     resultsList.innerHTML = '<li class="snippet-item" style="text-align: center; color: #ff5555; pointer-events: none;">Critical Error: Electron API not found.</li>';
     return;
@@ -84,14 +77,13 @@ function filterSnippets(query: string) {
   }
 
   renderResults();
-  updatePreview();
 }
 
 function renderResults() {
   resultsList.innerHTML = '';
 
   if (filteredSnippets.length === 0) {
-    resultsList.innerHTML = '<li class="snippet-item" style="text-align: center; color: var(--text-muted); pointer-events: none; opacity: 0.5; padding: 20px;">No snippets found.</li>';
+    resultsList.innerHTML = '<li class="snippet-item" style="text-align: center; color: var(--text-muted); pointer-events: none; opacity: 0.5; padding: 20px; height: auto;">No snippets found. Press ⌘N to create one.</li>';
     return;
   }
 
@@ -101,8 +93,14 @@ function renderResults() {
 
     li.onclick = () => {
       selectedIndex = index;
-      renderResults();
-      updatePreview();
+      const allItems = resultsList.querySelectorAll('.snippet-item');
+      allItems.forEach(item => item.classList.remove('selected'));
+      li.classList.add('selected');
+    };
+
+    // Double-click to paste
+    li.ondblclick = () => {
+      triggerPaste();
     };
 
     const iconDiv = document.createElement('div');
@@ -116,24 +114,46 @@ function renderResults() {
     titleSpan.className = 'snippet-title';
     titleSpan.textContent = snippet.title;
     
+    const previewSpan = document.createElement('span');
+    previewSpan.className = 'snippet-preview';
+    // Single line preview (replace newlines with spaces)
+    previewSpan.textContent = snippet.content.replace(/\n/g, ' ').substring(0, 80);
+    
     infoDiv.appendChild(titleSpan);
+    infoDiv.appendChild(previewSpan);
 
     const rightDiv = document.createElement('div');
     rightDiv.className = 'snippet-item-right';
 
-    const deleteBtn = document.createElement('div');
-    deleteBtn.className = 'delete-btn';
-    deleteBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 16px;">delete</span>';
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'snippet-actions';
+
+    const editBtn = document.createElement('button');
+    editBtn.className = 'action-btn';
+    editBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px;">edit</span>';
+    editBtn.title = 'Edit';
+    editBtn.onclick = (e) => {
+      e.stopPropagation();
+      openModal(snippet.id);
+    };
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'action-btn delete';
+    deleteBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px;">delete</span>';
+    deleteBtn.title = 'Delete';
     deleteBtn.onclick = (e) => {
       e.stopPropagation();
       deleteSnippet(snippet.id);
     };
 
+    actionsDiv.appendChild(editBtn);
+    actionsDiv.appendChild(deleteBtn);
+
     const tagSpan = document.createElement('span');
     tagSpan.className = 'snippet-item-tag';
-    tagSpan.textContent = 'SNIP';
+    tagSpan.textContent = 'TEXT';
 
-    rightDiv.appendChild(deleteBtn);
+    rightDiv.appendChild(actionsDiv);
     rightDiv.appendChild(tagSpan);
 
     li.appendChild(iconDiv);
@@ -145,19 +165,6 @@ function renderResults() {
   const selectedEl = resultsList.querySelector('.selected');
   if (selectedEl) {
     selectedEl.scrollIntoView({ block: 'nearest' });
-  }
-}
-
-function updatePreview() {
-  if (filteredSnippets.length > 0 && selectedIndex >= 0) {
-    const selected = filteredSnippets[selectedIndex];
-    previewPane.classList.remove('hidden');
-    previewEmpty.classList.add('hidden');
-    previewContent.textContent = selected.content;
-  } else {
-    previewPane.classList.add('hidden');
-    previewEmpty.classList.remove('hidden');
-    previewContent.textContent = '';
   }
 }
 
@@ -249,18 +256,6 @@ btnSave.onclick = handleSave;
 btnCancel.onclick = closeModal;
 btnCloseModal.onclick = closeModal;
 
-btnCopyPreview.onclick = () => {
-  if (filteredSnippets[selectedIndex]) triggerPaste();
-};
-
-btnEditPreview.onclick = () => {
-  if (filteredSnippets[selectedIndex]) openModal(filteredSnippets[selectedIndex].id);
-};
-
-btnDeletePreview.onclick = () => {
-  if (filteredSnippets[selectedIndex]) deleteSnippet(filteredSnippets[selectedIndex].id);
-};
-
 document.addEventListener('keydown', (e) => {
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'n') {
     e.preventDefault();
@@ -283,14 +278,12 @@ document.addEventListener('keydown', (e) => {
     if (selectedIndex < filteredSnippets.length - 1) {
       selectedIndex++;
       renderResults();
-      updatePreview();
     }
   } else if (e.key === 'ArrowUp') {
     e.preventDefault();
     if (selectedIndex > 0) {
       selectedIndex--;
       renderResults();
-      updatePreview();
     }
   } else if (e.key === 'Enter') {
     e.preventDefault();
@@ -304,6 +297,8 @@ document.addEventListener('keydown', (e) => {
     if (searchInput.value) {
       searchInput.value = '';
       filterSnippets('');
+    } else {
+      window.electronAPI.hideWindow();
     }
   }
 });

@@ -65,6 +65,14 @@ app.whenReady().then(() => {
     fs.writeFileSync(STORE_PATH, JSON.stringify(snippets, null, 2));
     console.log("[Electron] File written successfully");
   });
+  ipcMain.handle("hide-window", () => {
+    if (mainWindow) {
+      mainWindow.hide();
+      if (process.platform === "darwin") {
+        app.hide();
+      }
+    }
+  });
   ipcMain.handle("paste-snippet", async (e, text) => {
     console.log("[Electron] paste-snippet IPC received with text length:", text.length);
     if (mainWindow) {
