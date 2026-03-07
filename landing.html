@@ -51,7 +51,55 @@
         }
 
         .hero-gradient {
-            background: radial-gradient(circle at 50% 50%, rgba(62, 82, 239, 0.15) 0%, transparent 50%);
+            background: radial-gradient(circle at 50% 50%, rgba(62, 82, 239, 0.1) 0%, transparent 50%);
+        }
+
+        @keyframes aura-float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        @keyframes aura-drift {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-50px, 30px) rotate(180deg); }
+        }
+
+        .aura-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            z-index: -1;
+            pointer-events: none;
+            will-change: transform;
+        }
+
+        .aura-1 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, #3e52ef, transparent);
+            top: -10%;
+            right: -10%;
+            animation: aura-float 20s infinite ease-in-out;
+        }
+
+        .aura-2 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #6366f1, transparent);
+            bottom: 20%;
+            left: -10%;
+            animation: aura-drift 25s infinite linear;
+        }
+
+        .aura-3 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #3e52ef, transparent);
+            top: 40%;
+            right: 20%;
+            animation: aura-float 18s infinite reverse ease-in-out;
         }
     </style>
 </head>
@@ -78,13 +126,20 @@
             </div>
         </div>
     </nav>
-    <main class="relative pt-32">
-        <div class="absolute inset-0 hero-gradient -z-10"></div>
+    <main class="relative pt-32 min-h-screen">
+        <!-- Ambient Aura Blobs -->
+        <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+            <div class="aura-blob aura-1 text-slate-100"></div>
+            <div class="aura-blob aura-2"></div>
+            <div class="aura-blob aura-3"></div>
+        </div>
+        
+        <div class="absolute inset-0 hero-gradient -z-20"></div>
         <section class="max-w-7xl mx-auto px-6 pt-20 pb-32 text-center">
             <div
                 class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold mb-8 uppercase tracking-widest">
                 <span class="material-symbols-outlined text-sm">bolt</span>
-                v2.0 Available Now
+                Initial Release Available Now
             </div>
             <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-8 max-w-4xl mx-auto leading-[1.1]">
                 Snippets at the <span class="text-primary">speed of thought.</span>
@@ -107,38 +162,57 @@
             <div class="relative max-w-5xl mx-auto">
                 <div class="absolute -inset-4 bg-primary/20 blur-3xl rounded-full opacity-30"></div>
                 <div class="relative glass-card rounded-2xl p-4 shadow-2xl">
-                    <div class="w-full aspect-[16/10] rounded-xl overflow-hidden bg-slate-900 flex items-center justify-center border border-white/10"
-                        data-alt="Dark blurred desktop background with a sleek code editor"
-                        style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB9TjMxunJjw68vbjPpP2dNm7SWU3ftVRY8Wr6YulAWZgJNQFTGymRy8ixiZL40PQOI7HHJ3kQeY-F7XTPHjSR28yJFrVv_RJklXL8yljKQ3ZH6xmT2MPu1-4G8CK4xzUQbzh9MUXwlmuULrneBc9SH3VevGSUDAgNOnE9D_-yriE5jbfyF_ww7pz4CEGDoWH3xCMQb2V4gDi6J_keoOuakfs7oVoMrKunuHv9qZDee65eVSO-v907F6vGZ4KUzWmxOUzwJtA_3IMtM'); background-size: cover; background-position: center;">
-                        <div class="glass-card w-[480px] p-4 rounded-xl shadow-2xl flex flex-col gap-3">
-                            <div class="flex items-center gap-3 pb-2 border-b border-white/10">
-                                <span class="material-symbols-outlined text-primary">search</span>
-                                <span class="text-white/40 text-sm">Search snippets...</span>
+                    <div class="w-full aspect-[16/10] rounded-xl overflow-hidden bg-slate-950 flex flex-col items-center justify-center border border-white/10 relative"
+                        data-alt="Modern dark code editor simulation">
+                        
+                        <!-- Simulated Editor (The "Target" App) -->
+                        <div class="absolute inset-6 bg-[#0a0b14] rounded-lg border border-white/5 p-8 font-mono text-sm overflow-hidden text-left shadow-2xl">
+                            <div class="flex items-center justify-between mb-6 opacity-30">
+                                <div class="flex gap-1.5">
+                                    <div class="size-2.5 rounded-full bg-slate-600"></div>
+                                    <div class="size-2.5 rounded-full bg-slate-600"></div>
+                                    <div class="size-2.5 rounded-full bg-slate-600"></div>
+                                </div>
+                                <div class="text-[10px] uppercase tracking-widest text-slate-500">Editor — main.ts</div>
                             </div>
-                            <div class="flex flex-col gap-1">
-                                <div
-                                    class="bg-primary/20 border border-primary/30 p-2 rounded flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <span class="material-symbols-outlined text-primary text-sm">terminal</span>
-                                        <span class="text-white text-sm">Docker Cleanup</span>
-                                    </div>
-                                    <span class="text-white/40 text-[10px] font-mono">⌘ 1</span>
+                            <div id="editor-content" class="text-white/40 whitespace-pre leading-relaxed">
+<span class="text-primary/60">// Echo will paste here...</span>
+<span class="text-white/20">$ </span></div>
+                        </div>
+
+                        <!-- Echo UI (The "Overlay" App) -->
+                        <div class="glass-card w-[420px] p-4 rounded-xl shadow-2xl flex flex-col gap-3 relative overflow-hidden z-10 -translate-y-4">
+                            <div id="demo-mockup" class="flex flex-col gap-3">
+                                <div class="flex items-center gap-3 pb-2 border-b border-white/10">
+                                    <span class="material-symbols-outlined text-primary">search</span>
+                                    <span id="demo-search" class="text-white/40 text-sm h-5">Search snippets...</span>
+                                    <span id="demo-cursor" class="w-0.5 h-4 bg-primary animate-pulse hidden"></span>
                                 </div>
-                                <div
-                                    class="p-2 rounded flex items-center justify-between hover:bg-white/5 cursor-pointer">
-                                    <div class="flex items-center gap-3">
-                                        <span class="material-symbols-outlined text-white/40 text-sm">javascript</span>
-                                        <span class="text-white text-sm">React Hook Template</span>
+                                <div class="flex flex-col gap-1">
+                                    <div id="snippet-1" class="transition-all duration-300 p-2 rounded flex items-center justify-between border border-transparent">
+                                        <div class="flex items-center gap-3">
+                                            <span id="snippet-icon" class="material-symbols-outlined text-primary text-sm">terminal</span>
+                                            <span id="snippet-title" class="text-white text-sm">Docker Cleanup</span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span id="pasted-badge" class="hidden text-[10px] font-bold text-primary bg-primary/20 px-1.5 py-0.5 rounded">PASTED</span>
+                                            <span class="text-white/40 text-[10px] font-mono">⌘ 1</span>
+                                        </div>
                                     </div>
-                                    <span class="text-white/40 text-[10px] font-mono">⌘ 2</span>
-                                </div>
-                                <div
-                                    class="p-2 rounded flex items-center justify-between hover:bg-white/5 cursor-pointer">
-                                    <div class="flex items-center gap-3">
-                                        <span class="material-symbols-outlined text-white/40 text-sm">html</span>
-                                        <span class="text-white text-sm">Tailwind Navbar</span>
+                                    <div id="snippet-2" class="p-2 rounded flex items-center justify-between opacity-100 transition-opacity duration-300">
+                                        <div class="flex items-center gap-3">
+                                            <span class="material-symbols-outlined text-white/40 text-sm">javascript</span>
+                                            <span class="text-white/50 text-sm">React Hook Template</span>
+                                        </div>
+                                        <span class="text-white/40 text-[10px] font-mono">⌘ 2</span>
                                     </div>
-                                    <span class="text-white/40 text-[10px] font-mono">⌘ 3</span>
+                                    <div id="snippet-3" class="p-2 rounded flex items-center justify-between opacity-100 transition-opacity duration-300">
+                                        <div class="flex items-center gap-3">
+                                            <span class="material-symbols-outlined text-white/40 text-sm">html</span>
+                                            <span class="text-white/50 text-sm">Tailwind Navbar</span>
+                                        </div>
+                                        <span class="text-white/40 text-[10px] font-mono">⌘ 3</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -428,6 +502,113 @@
             <p class="text-sm text-slate-500">© 2026 Echo Inc. Built for the future.</p>
         </div>
     </footer>
+    <script>
+        const demoSearch = document.getElementById('demo-search');
+        const demoCursor = document.getElementById('demo-cursor');
+        const snippet1 = document.getElementById('snippet-1');
+        const snippet2 = document.getElementById('snippet-2');
+        const snippet3 = document.getElementById('snippet-3');
+        const snippetTitle = document.getElementById('snippet-title');
+        const snippetIcon = document.getElementById('snippet-icon');
+        const pastedBadge = document.getElementById('pasted-badge');
+        const editorContent = document.getElementById('editor-content');
+
+        const scenarios = [
+            {
+                search: "docker",
+                title: "Docker Cleanup",
+                icon: "terminal",
+                content: "docker system prune -af --volumes",
+                type: "shell"
+            },
+            {
+                search: "hook",
+                title: "useState Hook",
+                icon: "javascript",
+                content: "const [state, setState] = useState(null);",
+                type: "js"
+            },
+            {
+                search: "navbar",
+                title: "Tailwind Navbar",
+                icon: "html",
+                content: "<nav class=\"flex items-center justify-between\">\n  <Logo />\n</nav>",
+                type: "html"
+            }
+        ];
+        
+        let scenarioIndex = 0;
+
+        function runDemo() {
+            const scenario = scenarios[scenarioIndex];
+            
+            // Reset UI
+            demoSearch.textContent = "Search snippets...";
+            demoSearch.classList.add('text-white/40');
+            demoCursor.classList.add('hidden');
+            snippet1.className = "p-2 rounded flex items-center justify-between border border-transparent transition-all duration-300";
+            snippet2.classList.remove('opacity-0');
+            snippet3.classList.remove('opacity-0');
+            pastedBadge.classList.add('hidden');
+            snippetTitle.textContent = scenario.title;
+            snippetIcon.textContent = scenario.icon;
+            
+            // Editor reset
+            editorContent.innerHTML = `<span class="text-blue-400">// Echo Demo ${scenario.type.toUpperCase()}</span>\n<span class="text-white/20">$ </span>`;
+
+            setTimeout(() => {
+                // 1. Start typing search
+                demoSearch.textContent = "";
+                demoSearch.classList.remove('text-white/40');
+                demoSearch.classList.add('text-white');
+                demoCursor.classList.remove('hidden');
+                
+                typeText(demoSearch, scenario.search, 0, () => {
+                    setTimeout(() => {
+                        // 2. Filter list
+                        snippet2.classList.add('opacity-0');
+                        snippet3.classList.add('opacity-0');
+
+                        setTimeout(() => {
+                            // 3. Select item
+                            snippet1.classList.add('bg-primary/20', 'border-primary/30');
+
+                            setTimeout(() => {
+                                // 4. Paste action (trigger badge and typing in editor)
+                                pastedBadge.classList.remove('hidden');
+                                snippet1.classList.add('scale-[1.02]');
+                                
+                                // Create code container in editor
+                                const codeSpan = document.createElement('span');
+                                codeSpan.className = "text-white";
+                                editorContent.appendChild(codeSpan);
+                                
+                                typeText(codeSpan, scenario.content, 0, () => {
+                                    setTimeout(() => {
+                                        snippet1.classList.remove('scale-[1.02]');
+                                        scenarioIndex = (scenarioIndex + 1) % scenarios.length;
+                                        setTimeout(runDemo, 3000); // Wait and loop
+                                    }, 1000);
+                                }, 40); // Faster typing for the snippet
+                            }, 800);
+                        }, 500);
+                    }, 500);
+                }, 100);
+            }, 1000);
+        }
+
+        function typeText(element, text, i, callback, speed = 100) {
+            if (i < text.length) {
+                element.textContent += text.charAt(i);
+                setTimeout(() => typeText(element, text, i + 1, callback, speed), speed);
+            } else if (callback) {
+                callback();
+            }
+        }
+
+        // Start the loop
+        runDemo();
+    </script>
 </body>
 
 </html>
