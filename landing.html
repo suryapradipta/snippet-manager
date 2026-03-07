@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Echo - Snippets at the speed of thought</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3e52ef",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101222",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-nav {
+            background: rgba(16, 18, 34, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .hero-gradient {
+            background: radial-gradient(circle at 50% 50%, rgba(62, 82, 239, 0.15) 0%, transparent 50%);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 overflow-x-hidden">
+    <nav class="fixed top-0 w-full z-50 glass-nav">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img src="/logo.png" alt="Echo Logo" class="size-8 rounded">
+                <span class="text-xl font-bold tracking-tight">Echo</span>
+            </div>
+            <div class="hidden md:flex items-center gap-10">
+                <a class="text-sm font-medium hover:text-primary transition-colors" href="#features">Features</a>
+                <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Roadmap</a>
+                <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Pricing</a>
+                <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Changelog</a>
+            </div>
+            <div class="flex items-center gap-4">
+                <button
+                    class="px-5 py-2.5 bg-primary text-white text-sm font-bold rounded-lg hover:opacity-90 transition-all">
+                    Download
+                </button>
+            </div>
+        </div>
+    </nav>
+    <main class="relative pt-32">
+        <div class="absolute inset-0 hero-gradient -z-10"></div>
+        <section class="max-w-7xl mx-auto px-6 pt-20 pb-32 text-center">
+            <div
+                class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold mb-8 uppercase tracking-widest">
+                <span class="material-symbols-outlined text-sm">bolt</span>
+                v2.0 Available Now
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-8 max-w-4xl mx-auto leading-[1.1]">
+                Snippets at the <span class="text-primary">speed of thought.</span>
+            </h1>
+            <p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed">
+                The minimal snippet manager for macOS. Auto-paste directly into any app with a native, translucent
+                interface that feels like part of the OS.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-24">
+                <button
+                    class="w-full sm:w-auto px-8 py-4 bg-primary text-white font-bold rounded-xl flex items-center justify-center gap-3 hover:scale-105 transition-transform">
+                    <span class="material-symbols-outlined">ios</span>
+                    Download for macOS
+                </button>
+                <button
+                    class="w-full sm:w-auto px-8 py-4 glass-card font-bold rounded-xl flex items-center justify-center gap-3 hover:bg-white/5 transition-colors">
+                    Full Roadmap
+                </button>
+            </div>
+            <div class="relative max-w-5xl mx-auto">
+                <div class="absolute -inset-4 bg-primary/20 blur-3xl rounded-full opacity-30"></div>
+                <div class="relative glass-card rounded-2xl p-4 shadow-2xl">
+                    <div class="w-full aspect-[16/10] rounded-xl overflow-hidden bg-slate-900 flex items-center justify-center border border-white/10"
+                        data-alt="Dark blurred desktop background with a sleek code editor"
+                        style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB9TjMxunJjw68vbjPpP2dNm7SWU3ftVRY8Wr6YulAWZgJNQFTGymRy8ixiZL40PQOI7HHJ3kQeY-F7XTPHjSR28yJFrVv_RJklXL8yljKQ3ZH6xmT2MPu1-4G8CK4xzUQbzh9MUXwlmuULrneBc9SH3VevGSUDAgNOnE9D_-yriE5jbfyF_ww7pz4CEGDoWH3xCMQb2V4gDi6J_keoOuakfs7oVoMrKunuHv9qZDee65eVSO-v907F6vGZ4KUzWmxOUzwJtA_3IMtM'); background-size: cover; background-position: center;">
+                        <div class="glass-card w-[480px] p-4 rounded-xl shadow-2xl flex flex-col gap-3">
+                            <div class="flex items-center gap-3 pb-2 border-b border-white/10">
+                                <span class="material-symbols-outlined text-primary">search</span>
+                                <span class="text-white/40 text-sm">Search snippets...</span>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <div
+                                    class="bg-primary/20 border border-primary/30 p-2 rounded flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-primary text-sm">terminal</span>
+                                        <span class="text-white text-sm">Docker Cleanup</span>
+                                    </div>
+                                    <span class="text-white/40 text-[10px] font-mono">⌘ 1</span>
+                                </div>
+                                <div
+                                    class="p-2 rounded flex items-center justify-between hover:bg-white/5 cursor-pointer">
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-white/40 text-sm">javascript</span>
+                                        <span class="text-white text-sm">React Hook Template</span>
+                                    </div>
+                                    <span class="text-white/40 text-[10px] font-mono">⌘ 2</span>
+                                </div>
+                                <div
+                                    class="p-2 rounded flex items-center justify-between hover:bg-white/5 cursor-pointer">
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-white/40 text-sm">html</span>
+                                        <span class="text-white text-sm">Tailwind Navbar</span>
+                                    </div>
+                                    <span class="text-white/40 text-[10px] font-mono">⌘ 3</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="features" class="max-w-7xl mx-auto px-6 py-24 border-t border-white/5">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">How it works</h2>
+                <p class="text-slate-400">Three steps to a more productive workflow.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-12">
+                <div class="text-center group">
+                    <div
+                        class="size-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto mb-6 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-3xl">content_copy</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">1. Capture</h3>
+                    <p class="text-slate-400 text-sm">Copy any code snippet or text. Echo automatically detects and
+                        prepares it for saving.</p>
+                </div>
+                <div class="text-center group">
+                    <div
+                        class="size-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto mb-6 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-3xl">folder_open</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">2. Organize</h3>
+                    <p class="text-slate-400 text-sm">Tag your snippets, add dynamic variables, and organize them into
+                        searchable collections.</p>
+                </div>
+                <div class="text-center group">
+                    <div
+                        class="size-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto mb-6 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-3xl">bolt</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">3. Auto-Paste</h3>
+                    <p class="text-slate-400 text-sm">Hit your global hotkey and watch as Echo pastes the snippet
+                        directly into your active app.</p>
+                </div>
+            </div>
+        </section>
+        <section class="max-w-7xl mx-auto px-6 py-24">
+            <div class="grid md:grid-cols-2 gap-24 items-center">
+                <div>
+                    <h2 class="text-4xl font-bold mb-6">Your keyboard is the <span class="text-primary">only
+                            interface</span> you need.</h2>
+                    <p class="text-slate-600 dark:text-slate-400 mb-10 leading-relaxed">
+                        Optimized for muscle memory. With sub-10ms search and custom global hotkeys, your snippets are
+                        always exactly where you need them, without ever lifting your hands from the keys.
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div class="p-6 glass-card rounded-xl">
+                            <span class="material-symbols-outlined text-primary mb-4">bolt</span>
+                            <h3 class="font-bold mb-2">Sub-10ms Search</h3>
+                            <p class="text-sm text-slate-500">Instant results regardless of library size.</p>
+                        </div>
+                        <div class="p-6 glass-card rounded-xl">
+                            <span class="material-symbols-outlined text-primary mb-4">keyboard</span>
+                            <h3 class="font-bold mb-2">Global Hotkeys</h3>
+                            <p class="text-sm text-slate-500">Access your library from any active window.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div
+                        class="aspect-square glass-card rounded-3xl overflow-hidden flex items-center justify-center p-12">
+                        <div class="grid grid-cols-4 gap-4 w-full">
+                            <div
+                                class="aspect-square glass-card rounded-lg flex items-center justify-center text-white/20 font-bold">
+                                ⌘</div>
+                            <div
+                                class="aspect-square glass-card rounded-lg flex items-center justify-center text-white/20 font-bold">
+                                ⌥</div>
+                            <div
+                                class="aspect-square bg-primary rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-primary/40">
+                                G</div>
+                            <div
+                                class="aspect-square glass-card rounded-lg flex items-center justify-center text-white/20 font-bold">
+                                Space</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="max-w-7xl mx-auto px-6 py-24 bg-primary/5 rounded-[2rem] my-24 border border-primary/10">
+            <div class="text-center mb-20">
+                <h2 class="text-4xl font-bold mb-4">Works everywhere you code.</h2>
+                <p class="text-slate-600 dark:text-slate-400">Seamlessly integrated into your daily workflow.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8"><!-- VS Code -->
+                <div
+                    class="glass-card p-6 rounded-2xl flex flex-col items-center text-center hover:border-primary/50 transition-colors">
+                    <div class="size-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-blue-400">code</span>
+                    </div>
+                    <h4 class="font-bold mb-2">VS Code</h4>
+                    <p class="text-xs text-slate-500">Native extension support</p>
+                </div>
+                <!-- Terminal -->
+                <div
+                    class="glass-card p-6 rounded-2xl flex flex-col items-center text-center hover:border-primary/50 transition-colors">
+                    <div class="size-12 bg-green-500/20 rounded-lg flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-green-400">terminal</span>
+                    </div>
+                    <h4 class="font-bold mb-2">Terminal</h4>
+                    <p class="text-xs text-slate-500">Zsh &amp; Bash integration</p>
+                </div>
+                <!-- Slack -->
+                <div
+                    class="glass-card p-6 rounded-2xl flex flex-col items-center text-center hover:border-primary/50 transition-colors">
+                    <div class="size-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-purple-400">chat</span>
+                    </div>
+                    <h4 class="font-bold mb-2">Slack</h4>
+                    <p class="text-xs text-slate-500">Share snippets instantly</p>
+                </div>
+                <!-- Browsers -->
+                <div
+                    class="glass-card p-6 rounded-2xl flex flex-col items-center text-center hover:border-primary/50 transition-colors">
+                    <div class="size-12 bg-orange-500/20 rounded-lg flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-orange-400">language</span>
+                    </div>
+                    <h4 class="font-bold mb-2">Browsers</h4>
+                    <p class="text-xs text-slate-500">Chrome &amp; Firefox</p>
+                </div>
+                <!-- Xcode -->
+                <div
+                    class="glass-card p-6 rounded-2xl flex flex-col items-center text-center hover:border-primary/50 transition-colors">
+                    <div class="size-12 bg-blue-400/20 rounded-lg flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-blue-300">developer_mode_tv</span>
+                    </div>
+                    <h4 class="font-bold mb-2">Xcode</h4>
+                    <p class="text-xs text-slate-500">Optimized for Swift</p>
+                </div>
+                <!-- Raycast -->
+                <div
+                    class="glass-card p-6 rounded-2xl flex flex-col items-center text-center hover:border-primary/50 transition-colors">
+                    <div class="size-12 bg-red-500/20 rounded-lg flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-red-400">search</span>
+                    </div>
+                    <h4 class="font-bold mb-2">Raycast</h4>
+                    <p class="text-xs text-slate-500">Power-user extension</p>
+                </div>
+            </div>
+        </section>
+        <section class="max-w-7xl mx-auto px-6 py-24">
+            <div class="grid md:grid-cols-2 gap-24 items-center">
+                <div class="order-2 md:order-1">
+                    <div class="glass-card rounded-2xl p-8 font-mono text-sm leading-loose">
+                        <div class="flex gap-2 mb-4">
+                            <div class="size-3 rounded-full bg-red-500/50"></div>
+                            <div class="size-3 rounded-full bg-yellow-500/50"></div>
+                            <div class="size-3 rounded-full bg-green-500/50"></div>
+                        </div>
+                        <div class="text-white/40">1   const fetchUser = async (id) =&gt; {</div>
+                        <div class="text-white/40">2     const res = await fetch(`</div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-white/40">3       </span>
+                            <span
+                                class="bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30 font-bold">API_ENDPOINT</span>
+                            <span class="text-white/40">/users/${id}?key=</span>
+                            <span
+                                class="bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30 font-bold">API_KEY</span>
+                        </div>
+                        <div class="text-white/40">4     `);</div>
+                        <div class="text-white/40">5     return res.json();</div>
+                        <div class="text-white/40">6   };</div>
+                    </div>
+                </div>
+                <div class="order-1 md:order-2">
+                    <h2 class="text-4xl font-bold mb-6">Beyond static text.<br /><span class="text-primary">Meet Dynamic
+                            Variables.</span></h2>
+                    <p class="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
+                        Static snippets are boring. Create templates with placeholders for URLs, API keys, current
+                        dates, or even clipboard content. Echo prompts you for values only when needed.
+                    </p>
+                    <ul class="space-y-4">
+                        <li class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-primary text-sm">check_circle</span>
+                            <span class="text-sm font-medium">Smart placeholders with default values</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-primary text-sm">check_circle</span>
+                            <span class="text-sm font-medium">Auto-insert current date &amp; time</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-primary text-sm">check_circle</span>
+                            <span class="text-sm font-medium">Inject clipboard history contents</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        <section class="max-w-7xl mx-auto px-6 py-24">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Loved by the community</h2>
+                <p class="text-slate-400">Join thousands of developers worldwide.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass-card p-8 rounded-2xl">
+                    <div class="flex gap-1 text-yellow-500 mb-4">
+                        <span class="material-symbols-outlined text-sm FILL">star</span>
+                        <span class="material-symbols-outlined text-sm FILL">star</span>
+                        <span class="material-symbols-outlined text-sm FILL">star</span>
+                        <span class="material-symbols-outlined text-sm FILL">star</span>
+                        <span class="material-symbols-outlined text-sm FILL">star</span>
+                    </div>
+                    <p class="text-slate-300 italic mb-6">"Echo has completely changed how I handle boilerplate. The
+                        auto-paste is like magic."</p>
+                    <div class="flex items-center gap-3">
+                        <div class="size-10 rounded-full bg-primary/20 flex items-center justify-center font-bold">JD
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm">John Doe</div>
+                            <div class="text-xs text-slate-500">Senior Frontend Dev</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-card p-8 rounded-2xl">
+                    <div class="flex gap-1 text-yellow-500 mb-4">
+                        <span class="material-symbols-outlined text-sm FILL">star</span>
+                        <span class="material-symbols-outlined text-sm FILL">star</span>
+                        <span class="material-symbols-outlined text-sm FILL">star</span>
+                        <span class="material-symbols-outlined text-sm FILL">star</span>
+                        <span class="material-symbols-outlined text-sm FILL">star</span>
+                    </div>
+                    <p class="text-slate-300 italic mb-6">"The cleanest UI I've ever seen in a dev tool. It really does
+                        feel like part of macOS."</p>
+                    <div class="flex items-center gap-3">
+                        <div class="size-10 rounded-full bg-primary/20 flex items-center justify-center font-bold">AS
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm">Alice Smith</div>
+                            <div class="text-xs text-slate-500">UI/UX Designer</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-card p-8 rounded-2xl">
+                    <div class="flex gap-1 text-yellow-500 mb-4">
+                        <span class="material-symbols-outlined text-sm FILL">star</span>
+                        <span class="material-symbols-outlined text-sm FILL">star</span>
+                        <span class="material-symbols-outlined text-sm FILL">star</span>
+                        <span class="material-symbols-outlined text-sm FILL">star</span>
+                        <span class="material-symbols-outlined text-sm FILL">star</span>
+                    </div>
+                    <p class="text-slate-300 italic mb-6">"Dynamic variables are a game-changer for my API testing
+                        workflow. Highly recommend."</p>
+                    <div class="flex items-center gap-3">
+                        <div class="size-10 rounded-full bg-primary/20 flex items-center justify-center font-bold">MK
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm">Mike K.</div>
+                            <div class="text-xs text-slate-500">Fullstack Engineer</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="max-w-4xl mx-auto px-6 py-32 text-center">
+            <h2 class="text-4xl md:text-5xl font-bold mb-8">Ready to supercharge your workflow?</h2>
+            <p class="text-slate-600 dark:text-slate-400 mb-12 text-lg">
+                Join 50,000+ developers who write code faster with Echo.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button
+                    class="w-full sm:w-auto px-10 py-5 bg-primary text-white font-bold rounded-xl flex items-center justify-center gap-3 hover:scale-105 transition-transform text-lg shadow-2xl shadow-primary/20">
+                    <span class="material-symbols-outlined">ios</span>
+                    Download for macOS
+                </button>
+            </div>
+            <p class="mt-8 text-sm text-slate-500">Free 14-day trial. No credit card required.</p>
+        </section>
+    </main>
+    <footer class="border-t border-white/5 py-12">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="flex items-center gap-3 opacity-50">
+                <img src="/logo.png" alt="Echo Logo" class="size-6 rounded">
+                <span class="font-bold tracking-tight">Echo</span>
+            </div>
+            <div class="flex gap-8 text-sm text-slate-500">
+                <a class="hover:text-primary transition-colors" href="#">Twitter</a>
+                <a class="hover:text-primary transition-colors" href="#">GitHub</a>
+                <a class="hover:text-primary transition-colors" href="#">Discord</a>
+                <a class="hover:text-primary transition-colors" href="#">Privacy</a>
+            </div>
+            <p class="text-sm text-slate-500">© 2026 Echo Inc. Built for the future.</p>
+        </div>
+    </footer>
+</body>
+
+</html>
