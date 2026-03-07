@@ -97,34 +97,39 @@ app.whenReady().then(() => {
     
     // 1. Hide the window first to return focus to underlying app
     if (mainWindow) {
+      if (process.platform === 'win32') {
+        mainWindow.setAlwaysOnTop(false); // Temporarily drop always-on-top to yield focus
+        mainWindow.minimize(); // Minimizing is often more effective on Windows for focus return
+      }
       mainWindow.hide();
       if (process.platform === 'darwin') {
-        app.hide(); // On Mac, this is more reliable for yielding focus back
+        app.hide(); 
       }
     }
     
     // Copy the snippet to clipboard
     clipboard.writeText(text);
 
-    // Wait a tiny bit for the window to fully hide and yield focus
-    const delay = process.platform === 'darwin' ? 200 : 100; // Reduced Mac delay for faster paste transition
+    // Wait for the OS to switch focus back to the target app
+    const delay = process.platform === 'darwin' ? 200 : 500; 
     setTimeout(() => {
       console.log('[Electron] Attempting auto-paste simulation...');
       
-      // 2. Simulate paste keystroke based on OS
       if (process.platform === 'darwin') {
-        // Use a more specific AppleScript that ensures System Events is ready
         const script = `osascript -e 'tell application "System Events" to keystroke "v" using command down'`;
-        exec(script, (error, stdout, stderr) => {
-          if (error) console.error('[Electron] Paste script error:', error);
-          if (stderr) console.error('[Electron] Paste script stderr:', stderr);
-          console.log('[Electron] Auto-paste simulation complete');
+        exec(script, (error) => {
+          if (error) console.error('[Electron] Mac Paste Error:', error);
         });
       } else if (process.platform === 'win32') {
-        const script = `powershell -c "$wshell = New-Object -ComObject wscript.shell; $wshell.SendKeys('^v')"`;
+        // More resilient Windows approach: Use a temporary VBScript or direct PowerShell with priority
+        const script = `powershell -WindowStyle Hidden -Command "$wshell = New-Object -ComObject wscript.shell; $wshell.SendKeys('^v')"`;
         exec(script, (error) => {
-          if (error) console.error('[Electron] Paste script error:', error);
-          console.log('[Electron] Auto-paste simulation complete');
+          if (error) console.error('[Electron] Windows Paste Error:', error);
+          
+          // Restore alwaysOnTop for next time
+          if (mainWindow) {
+            mainWindow.setAlwaysOnTop(true);
+          }
         });
       }
     }, delay);
