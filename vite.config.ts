@@ -18,8 +18,8 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main: 'index.html',
-        landing: 'landing.html',
+        index: 'index.html', // Now the landing page
+        app: 'app.html',    // Now the main application
       },
     },
   },

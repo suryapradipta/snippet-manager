@@ -43,9 +43,9 @@ function createWindow() {
 
   // Load Vite dev server URL in dev, else load built index.html
   if (process.env.VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
+    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL + 'app.html');
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+    mainWindow.loadFile(path.join(__dirname, '../dist/app.html'));
   }
 
   mainWindow.on('blur', () => {

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Echo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+  <div id="app" class="glass-container">
+    <!-- Header / Search -->
+    <header class="app-header">
+      <span class="material-symbols-outlined search-icon">search</span>
+      <input id="search-input" type="text" placeholder="Search snippets..." autocomplete="off" autofocus />
+      <div class="header-shortcuts">
+        <kbd>Esc</kbd>
+      </div>
+    </header>
+
+    <!-- Main Content Area: List View -->
+    <main class="main-content">
+      <div class="sidebar">
+        <ul id="results-list" class="glass-scroll">
+          <!-- Snippets injected here -->
+        </ul>
+      </div>
+    </main>
+
+    <!-- Footer / Status Bar -->
+    <footer class="app-footer">
+      <div class="footer-left">
+        <div class="shortcut-item">
+          <kbd>↑</kbd> <kbd>↓</kbd>
+          <span>Navigate</span>
+        </div>
+        <div class="divider"></div>
+        <div class="shortcut-item">
+          <kbd>Enter</kbd>
+          <span>Paste</span>
+        </div>
+        <div class="divider"></div>
+        <div class="shortcut-item">
+          <kbd class="mod-key">⌘</kbd><kbd>N</kbd>
+          <span>New</span>
+        </div>
+        <div class="divider"></div>
+        <div class="shortcut-item">
+          <kbd>Delete</kbd>
+          <span>Delete</span>
+        </div>
+      </div>
+      <div class="footer-right">
+        <span class="status-dot"></span>
+      </div>
+    </footer>
+
+    <!-- Modals -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+      <div id="editor-modal" class="modal glass-panel">
+        <header class="modal-header">
+          <div class="header-title">
+            <h1 id="modal-title">Create Snippet</h1>
+            <p id="modal-subtitle">Define a new shortcut for your workflow</p>
+          </div>
+          <button id="btn-close-modal" class="btn-close">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </header>
+        
+        <div class="modal-body glass-scroll">
+          <div class="form-group">
+            <label>Label / Title</label>
+            <div class="input-with-icon">
+              <input id="add-title" type="text" placeholder="e.g. Welcome Message" autocomplete="off" />
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <div class="editor-header">
+              <label>Content</label>
+              <span class="editor-type">Markdown / Code</span>
+            </div>
+            <div class="editor-outer-container">
+              <div class="line-numbers">
+                <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+              </div>
+              <textarea id="add-content" placeholder="Write your snippet content here..." spellcheck="false"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <footer class="modal-footer">
+          <div class="footer-status">
+            <div class="status-dot green"></div>
+            <span>Ready to save</span>
+          </div>
+          <div class="modal-actions">
+            <button id="btn-cancel" class="btn-ghost">Cancel</button>
+            <button id="btn-save" class="btn-primary">
+              Save Snippet
+              <kbd><span class="mod-key">⌘</span> ↵</kbd>
+            </button>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
