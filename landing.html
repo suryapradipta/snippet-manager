@@ -145,19 +145,17 @@
                 Snippets at the <span class="text-primary">speed of thought.</span>
             </h1>
             <p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed">
-                The minimal snippet manager for macOS. Auto-paste directly into any app with a native, translucent
-                interface that feels like part of the OS.
+                The minimal snippet manager built for productivity. Auto-paste directly into any app with a native, translucent
+                interface that feels like part of your OS.
             </p>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-24">
+            <div class="flex flex-col items-center justify-center gap-4 mb-24">
                 <button
+                    id="hero-download-btn"
                     class="w-full sm:w-auto px-8 py-4 bg-primary text-white font-bold rounded-xl flex items-center justify-center gap-3 hover:scale-105 transition-transform">
-                    <span class="material-symbols-outlined">ios</span>
-                    Download for macOS
+                    <span id="hero-download-icon" class="material-symbols-outlined">download</span>
+                    <span id="hero-download-text">Download Echo</span>
                 </button>
-                <button
-                    class="w-full sm:w-auto px-8 py-4 glass-card font-bold rounded-xl flex items-center justify-center gap-3 hover:bg-white/5 transition-colors">
-                    Full Roadmap
-                </button>
+                <p id="platform-alternate" class="text-xs text-slate-500"></p>
             </div>
             <div class="relative max-w-5xl mx-auto">
                 <div class="absolute -inset-4 bg-primary/20 blur-3xl rounded-full opacity-30"></div>
@@ -477,11 +475,12 @@
             <p class="text-slate-600 dark:text-slate-400 mb-12 text-lg">
                 Join 50,000+ developers who write code faster with Echo.
             </p>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div class="flex flex-col items-center justify-center gap-4">
                 <button
+                    id="cta-download-btn"
                     class="w-full sm:w-auto px-10 py-5 bg-primary text-white font-bold rounded-xl flex items-center justify-center gap-3 hover:scale-105 transition-transform text-lg shadow-2xl shadow-primary/20">
-                    <span class="material-symbols-outlined">ios</span>
-                    Download for macOS
+                    <span id="cta-download-icon" class="material-symbols-outlined">download</span>
+                    <span id="cta-download-text">Download for your OS</span>
                 </button>
             </div>
             <p class="mt-8 text-sm text-slate-500">Free 14-day trial. No credit card required.</p>
@@ -606,7 +605,40 @@
             }
         }
 
-        // Start the loop
+        // Platform detection script
+        function updatePlatformUI() {
+            const userAgent = window.navigator.userAgent.toLowerCase();
+            const isMac = userAgent.includes('mac');
+            const isWin = userAgent.includes('win');
+            
+            const heroBtn = document.getElementById('hero-download-btn');
+            const heroBtnText = document.getElementById('hero-download-text');
+            const heroBtnIcon = document.getElementById('hero-download-icon');
+            
+            const ctaBtnText = document.getElementById('cta-download-text');
+            const ctaBtnIcon = document.getElementById('cta-download-icon');
+            
+            const altText = document.getElementById('platform-alternate');
+
+            if (isWin) {
+                heroBtnText.textContent = "Download for Windows";
+                heroBtnIcon.textContent = "window";
+                ctaBtnText.textContent = "Download for Windows";
+                ctaBtnIcon.textContent = "window";
+                altText.innerHTML = "Also available for <a href='#' class='underline hover:text-primary'>macOS</a>";
+            } else if (isMac) {
+                heroBtnText.textContent = "Download for macOS";
+                heroBtnIcon.textContent = "ios"; // Using apple-like material icon
+                ctaBtnText.textContent = "Download for macOS";
+                ctaBtnIcon.textContent = "ios";
+                altText.innerHTML = "Also available for <a href='#' class='underline hover:text-primary'>Windows</a>";
+            } else {
+                heroBtnText.textContent = "Download Echo";
+                altText.textContent = "Available for Windows & macOS";
+            }
+        }
+
+        updatePlatformUI();
         runDemo();
     </script>
 </body>

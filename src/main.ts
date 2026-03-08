@@ -15,11 +15,13 @@ declare global {
       saveSnippets: (snippets: Snippet[]) => Promise<void>;
       pasteSnippet: (text: string) => Promise<void>;
       hideWindow: () => Promise<void>;
+      getPlatform: () => Promise<string>;
     }
   }
 }
 
-// State
+let platform = 'darwin';
+let modKey = '⌘';
 let snippets: Snippet[] = [];
 let filteredSnippets: Snippet[] = [];
 let selectedIndex = 0;
@@ -48,6 +50,14 @@ async function init() {
   }
   
   try {
+    platform = await window.electronAPI.getPlatform();
+    modKey = platform === 'darwin' ? '⌘' : 'Ctrl';
+    
+    // Update all initial mod-key labels
+    document.querySelectorAll('.mod-key').forEach(el => {
+      el.textContent = modKey;
+    });
+
     snippets = await window.electronAPI.getSnippets();
     console.log('[App] Loaded snippets:', snippets.length);
   } catch (err) {
@@ -83,7 +93,7 @@ function renderResults() {
   resultsList.innerHTML = '';
 
   if (filteredSnippets.length === 0) {
-    resultsList.innerHTML = '<li class="snippet-item" style="text-align: center; color: var(--text-muted); pointer-events: none; opacity: 0.5; padding: 20px; height: auto;">No snippets found. Press ⌘N to create one.</li>';
+    resultsList.innerHTML = `<li class="snippet-item" style="text-align: center; color: var(--text-muted); pointer-events: none; opacity: 0.5; padding: 20px; height: auto;">No snippets found. Press ${modKey}N to create one.</li>`;
     return;
   }
 

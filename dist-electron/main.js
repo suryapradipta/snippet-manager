@@ -76,27 +76,31 @@ app.whenReady().then(() => {
   ipcMain.handle("paste-snippet", async (e, text) => {
     console.log("[Electron] paste-snippet IPC received with text length:", text.length);
     if (mainWindow) {
+      if (process.platform === "win32") {
+        mainWindow.setAlwaysOnTop(false);
+        mainWindow.minimize();
+      }
       mainWindow.hide();
       if (process.platform === "darwin") {
         app.hide();
       }
     }
     clipboard.writeText(text);
-    const delay = process.platform === "darwin" ? 200 : 100;
+    const delay = process.platform === "darwin" ? 200 : 500;
     setTimeout(() => {
       console.log("[Electron] Attempting auto-paste simulation...");
       if (process.platform === "darwin") {
         const script = `osascript -e 'tell application "System Events" to keystroke "v" using command down'`;
-        exec(script, (error, stdout, stderr) => {
-          if (error) console.error("[Electron] Paste script error:", error);
-          if (stderr) console.error("[Electron] Paste script stderr:", stderr);
-          console.log("[Electron] Auto-paste simulation complete");
+        exec(script, (error) => {
+          if (error) console.error("[Electron] Mac Paste Error:", error);
         });
       } else if (process.platform === "win32") {
-        const script = `powershell -c "$wshell = New-Object -ComObject wscript.shell; $wshell.SendKeys('^v')"`;
+        const script = `powershell -WindowStyle Hidden -Command "$wshell = New-Object -ComObject wscript.shell; $wshell.SendKeys('^v')"`;
         exec(script, (error) => {
-          if (error) console.error("[Electron] Paste script error:", error);
-          console.log("[Electron] Auto-paste simulation complete");
+          if (error) console.error("[Electron] Windows Paste Error:", error);
+          if (mainWindow) {
+            mainWindow.setAlwaysOnTop(true);
+          }
         });
       }
     }, delay);
