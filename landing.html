@@ -623,17 +623,26 @@
             if (isWin) {
                 heroBtnText.textContent = "Download for Windows";
                 heroBtnIcon.textContent = "window";
+                heroBtn.href = "release/Echo-Setup-1.0.0.exe";
+                
                 ctaBtnText.textContent = "Download for Windows";
                 ctaBtnIcon.textContent = "window";
-                altText.innerHTML = "Also available for <a href='#' class='underline hover:text-primary'>macOS</a>";
+                ctaBtn.href = "release/Echo-Setup-1.0.0.exe";
+                
+                altText.innerHTML = "Also available for <a href='release/Echo-1.0.0.dmg' class='underline hover:text-primary'>macOS</a>";
             } else if (isMac) {
                 heroBtnText.textContent = "Download for macOS";
-                heroBtnIcon.textContent = "ios"; // Using apple-like material icon
+                heroBtnIcon.textContent = "ios"; 
+                heroBtn.href = "release/Echo-1.0.0.dmg";
+                
                 ctaBtnText.textContent = "Download for macOS";
                 ctaBtnIcon.textContent = "ios";
-                altText.innerHTML = "Also available for <a href='#' class='underline hover:text-primary'>Windows</a>";
+                ctaBtn.href = "release/Echo-1.0.0.dmg";
+                
+                altText.innerHTML = "Also available for <a href='release/Echo-Setup-1.0.0.exe' class='underline hover:text-primary'>Windows</a>";
             } else {
                 heroBtnText.textContent = "Download Echo";
+                heroBtn.href = "#";
                 altText.textContent = "Available for Windows & macOS";
             }
         }

@@ -1,20 +1,50 @@
 {
   "name": "echo",
+  "productName": "Echo",
+  "version": "1.0.0",
+  "description": "Minimalist code snippet manager with auto-paste.",
+  "author": "Echo Team",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "dist": "npm run build && electron-builder",
     "preview": "vite preview"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
     "electron": "^40.8.0",
+    "electron-builder": "^26.8.1",
     "typescript": "~5.9.3",
     "vite": "^5.4.21",
     "vite-plugin-electron": "^0.29.0"
+  },
+  "build": {
+    "appId": "com.echo.app",
+    "productName": "Echo",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "target": [
+        "dmg"
+      ],
+      "icon": "public/logo.png",
+      "identity": null,
+      "forceCodeSigning": false
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "public/logo.png"
+    }
   }
 }

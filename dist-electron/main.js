@@ -1,121 +1,61 @@
-import { app, globalShortcut, ipcMain, clipboard, BrowserWindow } from "electron";
-import path from "path";
-import { fileURLToPath } from "url";
-import { exec } from "child_process";
-import fs from "fs";
-const __dirname$1 = path.dirname(fileURLToPath(import.meta.url));
-let mainWindow = null;
-process.env.NODE_ENV !== "development";
-const STORE_PATH = path.join(app.getPath("userData"), "snippets.json");
-function initStore() {
-  if (!fs.existsSync(STORE_PATH)) {
-    fs.writeFileSync(STORE_PATH, JSON.stringify([]));
-  }
+import { app as t, globalShortcut as f, ipcMain as n, clipboard as g, BrowserWindow as w } from "electron";
+import r from "path";
+import { fileURLToPath as E } from "url";
+import { exec as c } from "child_process";
+import l from "fs";
+const p = r.dirname(E(import.meta.url));
+let e = null;
+process.env.NODE_ENV;
+const a = r.join(t.getPath("userData"), "snippets.json");
+function S() {
+  l.existsSync(a) || l.writeFileSync(a, JSON.stringify([]));
 }
-function createWindow() {
-  mainWindow = new BrowserWindow({
+function d() {
+  e = new w({
     width: 750,
     height: 520,
-    frame: false,
-    transparent: true,
-    alwaysOnTop: true,
-    hasShadow: true,
-    show: false,
+    frame: !1,
+    transparent: !0,
+    alwaysOnTop: !0,
+    hasShadow: !0,
+    show: !1,
     webPreferences: {
-      preload: path.join(__dirname$1, "preload.js"),
-      sandbox: false
+      preload: r.join(p, "preload.js"),
+      sandbox: !1
     }
-  });
-  if (process.platform === "darwin") {
-    mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
-    mainWindow.setAlwaysOnTop(true, "screen-saver");
-  } else {
-    mainWindow.setAlwaysOnTop(true);
-  }
-  if (process.env.VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
-  } else {
-    mainWindow.loadFile(path.join(__dirname$1, "../dist/index.html"));
-  }
-  mainWindow.on("blur", () => {
-    mainWindow == null ? void 0 : mainWindow.hide();
+  }), process.platform === "darwin" ? (e.setVisibleOnAllWorkspaces(!0, { visibleOnFullScreen: !0 }), e.setAlwaysOnTop(!0, "screen-saver")) : e.setAlwaysOnTop(!0), process.env.VITE_DEV_SERVER_URL ? e.loadURL(process.env.VITE_DEV_SERVER_URL) : e.loadFile(r.join(p, "../dist/index.html")), e.on("blur", () => {
+    e == null || e.hide();
   });
 }
-app.whenReady().then(() => {
-  initStore();
-  createWindow();
-  const shortcut = process.platform === "darwin" ? "Command+Shift+Space" : "Control+Shift+Space";
-  globalShortcut.register(shortcut, () => {
-    if (mainWindow) {
-      if (mainWindow.isVisible()) {
-        mainWindow.hide();
-      } else {
-        mainWindow.show();
-        mainWindow.focus();
-      }
-    }
-  });
-  ipcMain.handle("get-snippets", () => {
-    const raw = fs.readFileSync(STORE_PATH, "utf-8");
-    console.log("[Electron] get-snippets returning:", raw.substring(0, 100) + "...");
-    return JSON.parse(raw);
-  });
-  ipcMain.handle("save-snippets", (e, snippets) => {
-    console.log("[Electron] save-snippets called with", snippets.length, "items");
-    fs.writeFileSync(STORE_PATH, JSON.stringify(snippets, null, 2));
-    console.log("[Electron] File written successfully");
-  });
-  ipcMain.handle("hide-window", () => {
-    if (mainWindow) {
-      mainWindow.hide();
-      if (process.platform === "darwin") {
-        app.hide();
-      }
-    }
-  });
-  ipcMain.handle("paste-snippet", async (e, text) => {
-    console.log("[Electron] paste-snippet IPC received with text length:", text.length);
-    if (mainWindow) {
-      if (process.platform === "win32") {
-        mainWindow.setAlwaysOnTop(false);
-        mainWindow.minimize();
-      }
-      mainWindow.hide();
-      if (process.platform === "darwin") {
-        app.hide();
-      }
-    }
-    clipboard.writeText(text);
-    const delay = process.platform === "darwin" ? 200 : 500;
+t.whenReady().then(() => {
+  S(), d();
+  const m = process.platform === "darwin" ? "Command+Shift+Space" : "Control+Shift+Space";
+  f.register(m, () => {
+    e && (e.isVisible() ? e.hide() : (e.show(), e.focus()));
+  }), n.handle("get-snippets", () => {
+    const i = l.readFileSync(a, "utf-8");
+    return console.log("[Electron] get-snippets returning:", i.substring(0, 100) + "..."), JSON.parse(i);
+  }), n.handle("save-snippets", (i, s) => {
+    console.log("[Electron] save-snippets called with", s.length, "items"), l.writeFileSync(a, JSON.stringify(s, null, 2)), console.log("[Electron] File written successfully");
+  }), n.handle("hide-window", () => {
+    e && (e.hide(), process.platform === "darwin" && t.hide());
+  }), n.handle("paste-snippet", async (i, s) => {
+    console.log("[Electron] paste-snippet IPC received with text length:", s.length), e && (process.platform === "win32" && (e.setAlwaysOnTop(!1), e.minimize()), e.hide(), process.platform === "darwin" && t.hide()), g.writeText(s);
+    const h = process.platform === "darwin" ? 200 : 500;
     setTimeout(() => {
-      console.log("[Electron] Attempting auto-paste simulation...");
-      if (process.platform === "darwin") {
-        const script = `osascript -e 'tell application "System Events" to keystroke "v" using command down'`;
-        exec(script, (error) => {
-          if (error) console.error("[Electron] Mac Paste Error:", error);
-        });
-      } else if (process.platform === "win32") {
-        const script = `powershell -WindowStyle Hidden -Command "$wshell = New-Object -ComObject wscript.shell; $wshell.SendKeys('^v')"`;
-        exec(script, (error) => {
-          if (error) console.error("[Electron] Windows Paste Error:", error);
-          if (mainWindow) {
-            mainWindow.setAlwaysOnTop(true);
-          }
-        });
-      }
-    }, delay);
-  });
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
+      console.log("[Electron] Attempting auto-paste simulation..."), process.platform === "darwin" ? c(`osascript -e 'tell application "System Events" to keystroke "v" using command down'`, (o) => {
+        o && console.error("[Electron] Mac Paste Error:", o);
+      }) : process.platform === "win32" && c(`powershell -WindowStyle Hidden -Command "$wshell = New-Object -ComObject wscript.shell; $wshell.SendKeys('^v')"`, (o) => {
+        o && console.error("[Electron] Windows Paste Error:", o), e && e.setAlwaysOnTop(!0);
+      });
+    }, h);
+  }), t.on("activate", () => {
+    w.getAllWindows().length === 0 && d();
   });
 });
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
+t.on("window-all-closed", () => {
+  process.platform !== "darwin" && t.quit();
 });
-app.on("will-quit", () => {
-  globalShortcut.unregisterAll();
+t.on("will-quit", () => {
+  f.unregisterAll();
 });
