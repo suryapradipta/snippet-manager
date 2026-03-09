@@ -1,4 +1,5 @@
 import './style.css'
+import { supabase } from './supabase'
 
 interface Snippet {
   id: string;
@@ -15,7 +16,7 @@ interface Settings {
 
 // Global declaration for our exposed Electron API
 declare global {
-    interface Window {
+  interface Window {
     electronAPI: {
       getSnippets: () => Promise<Snippet[]>;
       saveSnippets: (snippets: Snippet[]) => Promise<void>;
@@ -42,6 +43,8 @@ let editingSnippetId: string | null = null;
 let isModalOpen = false;
 let isSettingsOpen = false;
 let isRecordingHotkey = false;
+let isSignUpMode = false;
+let currentUser: any = null;
 
 // DOM Elements
 const appContainer = document.getElementById('app') as HTMLElement;
@@ -72,6 +75,17 @@ const btnReset = document.querySelector('.btn-reset') as HTMLButtonElement;
 const settingLaunchLogin = document.getElementById('setting-launch-login') as HTMLInputElement;
 const settingHideBlur = document.getElementById('setting-hide-blur') as HTMLInputElement;
 const btnHotkey = document.querySelector('.hotkey-display') as HTMLElement;
+const btnLogout = document.getElementById('btn-logout') as HTMLButtonElement;
+
+// Auth DOM Elements
+const authOverlay = document.getElementById('auth-overlay') as HTMLElement;
+const authForm = document.getElementById('auth-form') as HTMLFormElement;
+const authEmail = document.getElementById('auth-email') as HTMLInputElement;
+const authPassword = document.getElementById('auth-password') as HTMLInputElement;
+const authError = document.getElementById('auth-error') as HTMLElement;
+const authSubtitle = document.getElementById('auth-subtitle') as HTMLElement;
+const btnAuthSubmit = document.getElementById('btn-auth-submit') as HTMLButtonElement;
+const btnToggleAuth = document.getElementById('btn-toggle-auth') as HTMLButtonElement;
 
 async function init() {
   console.log('[App] Initializing App...');
@@ -79,29 +93,86 @@ async function init() {
     resultsList.innerHTML = '<li class="snippet-item" style="text-align: center; color: #ff5555; pointer-events: none;">Critical Error: Electron API not found.</li>';
     return;
   }
-  
+
+  // Check Auth Session
+  const { data: { session } } = await supabase.auth.getSession();
+  updateAuthState(session?.user ?? null);
+
+  // Listen for auth changes
+  supabase.auth.onAuthStateChange((_event, session) => {
+    updateAuthState(session?.user ?? null);
+  });
+
   try {
     platform = await window.electronAPI.getPlatform();
     modKey = platform === 'darwin' ? '⌘' : 'Ctrl';
-    
+
     // Update all initial mod-key labels
     document.querySelectorAll('.mod-key').forEach(el => {
       el.textContent = modKey;
     });
 
-    snippets = await window.electronAPI.getSnippets();
     currentSettings = await window.electronAPI.getSettings();
-    console.log('[App] Loaded snippets:', snippets.length);
-    console.log('[App] Loaded settings:', currentSettings);
-    
     syncSettingsUI();
+
+    if (currentUser) {
+      await loadSnippets();
+    }
   } catch (err) {
     console.error('[App] Failed to load data:', err);
-    snippets = [];
   }
 
-  filterSnippets('');
   searchInput.focus();
+}
+
+function updateAuthState(user: any) {
+  currentUser = user;
+  if (user) {
+    authOverlay.classList.add('hidden');
+    appContainer.classList.remove('modal-open');
+    loadSnippets();
+  } else {
+    authOverlay.classList.remove('hidden');
+    appContainer.classList.add('modal-open');
+    resultsList.innerHTML = '';
+  }
+}
+
+async function loadSnippets() {
+  try {
+    // Always start with local snippets as a baseline/offline mode
+    snippets = await window.electronAPI.getSnippets();
+
+    if (currentUser) {
+      console.log('[App] Fetching snippets from Supabase...');
+      const { data, error } = await supabase
+        .from('snippets')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('[App] Supabase fetch error:', error);
+      } else if (data) {
+        console.log('[App] Supabase loaded:', data.length, 'items');
+        // Simple merge: Use cloud data if it exists
+        if (data.length > 0) {
+          snippets = data.map(d => ({
+            id: d.id,
+            title: d.title,
+            content: d.content,
+            createdAt: d.created_at
+          }));
+          // Sync back to local for offline use
+          await window.electronAPI.saveSnippets(snippets);
+        }
+      }
+    }
+
+    console.log('[App] Final snippet count:', snippets.length);
+    filterSnippets(searchInput.value || '');
+  } catch (err) {
+    console.error('[App] Failed to load snippets:', err);
+  }
 }
 
 // Logic: Filtering & Rendering
@@ -114,7 +185,7 @@ function filterSnippets(query: string) {
       s.title.toLowerCase().includes(q) || s.content.toLowerCase().includes(q)
     ).sort((a, b) => b.createdAt - a.createdAt);
   }
-  
+
   if (selectedIndex >= filteredSnippets.length) {
     selectedIndex = Math.max(0, filteredSnippets.length - 1);
   } else if (filteredSnippets.length > 0 && selectedIndex < 0) {
@@ -154,16 +225,16 @@ function renderResults() {
 
     const infoDiv = document.createElement('div');
     infoDiv.className = 'snippet-item-info';
-    
+
     const titleSpan = document.createElement('span');
     titleSpan.className = 'snippet-title';
     titleSpan.textContent = snippet.title;
-    
+
     const previewSpan = document.createElement('span');
     previewSpan.className = 'snippet-preview';
     // Single line preview (replace newlines with spaces)
     previewSpan.textContent = snippet.content.replace(/\n/g, ' ').substring(0, 80);
-    
+
     infoDiv.appendChild(titleSpan);
     infoDiv.appendChild(previewSpan);
 
@@ -221,6 +292,16 @@ async function deleteSnippet(id: string) {
 
   snippets = snippets.filter(s => s.id !== id);
   await window.electronAPI.saveSnippets(snippets);
+
+  if (currentUser) {
+    const { error } = await supabase
+      .from('snippets')
+      .delete()
+      .eq('id', id);
+    if (error) console.error('[App] Cloud delete error:', error);
+    else console.log('[App] Cloud delete successful');
+  }
+
   filterSnippets(searchInput.value);
 }
 
@@ -233,7 +314,7 @@ async function triggerPaste() {
 
 function openModal(snippetId: string | null = null) {
   const snippet = snippetId ? snippets.find(s => s.id === snippetId) : null;
-  
+
   editingSnippetId = snippetId;
   isModalOpen = true;
   isSettingsOpen = false;
@@ -241,7 +322,7 @@ function openModal(snippetId: string | null = null) {
   modalOverlay.classList.remove('hidden');
   settingsModal.classList.add('hidden');
   editorModal.classList.remove('hidden');
-  
+
   if (snippet) {
     modalTitle.textContent = 'Edit Snippet';
     addTitle.value = snippet.title;
@@ -251,7 +332,7 @@ function openModal(snippetId: string | null = null) {
     addTitle.value = searchInput.value;
     addContent.value = '';
   }
-  
+
   setTimeout(() => addTitle.focus(), 50);
 }
 
@@ -273,7 +354,7 @@ function openSettingsModal() {
   modalOverlay.classList.remove('hidden');
   editorModal.classList.add('hidden');
   settingsModal.classList.remove('hidden');
-  
+
   // Reset to General section
   switchSettingsSection('general');
 }
@@ -282,7 +363,7 @@ function switchSettingsSection(sectionId: string) {
   settingsSections.forEach(section => section.classList.add('hidden'));
   const activeSection = document.getElementById(`section-${sectionId}`);
   if (activeSection) activeSection.classList.remove('hidden');
-  
+
   settingsNavItems.forEach(item => {
     item.classList.remove('active');
     if (item.getAttribute('data-section') === sectionId) {
@@ -324,7 +405,7 @@ async function updateSettings(updates: Partial<Settings>) {
 async function handleSave() {
   const title = addTitle.value.trim();
   const content = addContent.value.trim();
-  
+
   if (!title || !content) {
     alert('Title and content are required.');
     return;
@@ -348,6 +429,32 @@ async function handleSave() {
   }
 
   await window.electronAPI.saveSnippets(snippets);
+
+  // Sync to Cloud if logged in
+  if (currentUser) {
+    const finalSnippet = snippets.find(s => s.id === (editingSnippetId || snippets[snippets.length - 1].id));
+
+    if (finalSnippet) {
+      console.log('[App] Attempting cloud sync for:', finalSnippet.title);
+      const { error } = await supabase
+        .from('snippets')
+        .upsert({
+          id: finalSnippet.id,
+          user_id: currentUser.id,
+          title: finalSnippet.title,
+          content: finalSnippet.content,
+          created_at: finalSnippet.createdAt
+        });
+
+      if (error) {
+        console.error('[App] Cloud sync error:', error.message, error.details);
+        alert('Cloud sync failed: ' + error.message);
+      } else {
+        console.log('[App] Cloud sync successful');
+      }
+    }
+  }
+
   filterSnippets(searchInput.value);
   closeModal();
 }
@@ -375,6 +482,13 @@ settingsNavItems.forEach(item => {
 settingLaunchLogin.onchange = () => updateSettings({ launchAtLogin: settingLaunchLogin.checked });
 settingHideBlur.onchange = () => updateSettings({ hideOnBlur: settingHideBlur.checked });
 
+btnLogout.onclick = async () => {
+  if (confirm('Are you sure you want to sign out?')) {
+    await supabase.auth.signOut();
+    closeModal();
+  }
+};
+
 btnReset.onclick = async () => {
   if (confirm('Reset all settings to default?')) {
     const defaultSettings: Settings = {
@@ -395,6 +509,12 @@ btnHotkey.onclick = () => {
 };
 
 document.addEventListener('keydown', (e) => {
+  if (currentUser === null) {
+    // If not logged in, only allow interaction with the auth form.
+    // Escape shouldn't hide window or anything.
+    return;
+  }
+
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'n') {
     e.preventDefault();
     openModal();
@@ -419,11 +539,11 @@ document.addEventListener('keydown', (e) => {
     // Use e.code to get the physical key and avoid special characters from Alt/Option
     const code = e.code;
     const isModifier = ['ControlLeft', 'ControlRight', 'ShiftLeft', 'ShiftRight', 'AltLeft', 'AltRight', 'MetaLeft', 'MetaRight'].includes(code);
-    
+
     if (!isModifier) {
       // Map e.code to Electron-friendly key names
       let key = code.replace('Key', '').replace('Digit', '');
-      
+
       const keyMap: Record<string, string> = {
         'Space': 'Space',
         'Enter': 'Return',
@@ -499,5 +619,54 @@ document.addEventListener('keydown', (e) => {
     }
   }
 });
+
+// Auth Event Listeners
+btnToggleAuth.onclick = () => {
+  isSignUpMode = !isSignUpMode;
+  authSubtitle.textContent = isSignUpMode
+    ? 'Create an account to start syncing snippets.'
+    : 'Sign in to sync your snippets across devices.';
+  btnAuthSubmit.querySelector('span')!.textContent = isSignUpMode ? 'Sign Up' : 'Continue';
+  btnToggleAuth.textContent = isSignUpMode ? 'Already have an account? Sign In' : 'Need an account? Sign Up';
+  authError.classList.add('hidden');
+  authForm.classList.remove('hidden');
+};
+
+authForm.onsubmit = async (e) => {
+  e.preventDefault();
+  const email = authEmail.value;
+  const password = authPassword.value;
+
+  authError.classList.add('hidden');
+  btnAuthSubmit.disabled = true;
+  const originalBtnText = btnAuthSubmit.querySelector('span')!.textContent;
+  btnAuthSubmit.querySelector('span')!.textContent = 'Processing...';
+
+  try {
+    let result;
+    if (isSignUpMode) {
+      result = await supabase.auth.signUp({ email, password });
+    } else {
+      result = await supabase.auth.signInWithPassword({ email, password });
+    }
+
+    if (result.error) {
+      authError.textContent = result.error.message;
+      authError.classList.remove('hidden');
+    } else if (isSignUpMode && result.data.user && !result.data.session) {
+      // Supabase returns user but no session if email confirmation is enabled
+      authSubtitle.innerHTML = '<span style="color: var(--success); font-weight: 600;">Check your email!</span><br>We\'ve sent a confirmation link to ' + email + '. Please click it to activate your account.';
+      authForm.classList.add('hidden');
+      btnToggleAuth.textContent = 'Back to Sign In';
+      isSignUpMode = false;
+    }
+  } catch (err: any) {
+    authError.textContent = err.message || 'An unexpected error occurred.';
+    authError.classList.remove('hidden');
+  } finally {
+    btnAuthSubmit.disabled = false;
+    btnAuthSubmit.querySelector('span')!.textContent = originalBtnText;
+  }
+};
 
 init();
