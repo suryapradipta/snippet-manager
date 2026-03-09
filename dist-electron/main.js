@@ -1,206 +1,127 @@
-import { app, nativeImage, Tray, Menu, ipcMain, clipboard, BrowserWindow, globalShortcut } from "electron";
-import path from "path";
-import { fileURLToPath } from "url";
-import { exec } from "child_process";
-import fs from "fs";
-const __dirname$1 = path.dirname(fileURLToPath(import.meta.url));
-let mainWindow = null;
-let tray = null;
-const isDev = !app.isPackaged;
-const STORE_PATH = path.join(app.getPath("userData"), "snippets.json");
-const SETTINGS_PATH = path.join(app.getPath("userData"), "settings.json");
-const DEFAULT_SETTINGS = {
-  launchAtLogin: true,
-  hideOnBlur: true,
+import { app as o, nativeImage as k, Tray as v, Menu as F, ipcMain as c, clipboard as P, dialog as R, systemPreferences as j, BrowserWindow as b, globalShortcut as w } from "electron";
+import r from "path";
+import { fileURLToPath as x } from "url";
+import { exec as S } from "child_process";
+import i from "fs";
+const f = r.dirname(x(import.meta.url));
+let e = null, g = null;
+const E = !o.isPackaged, y = r.join(o.getPath("userData"), "snippets.json"), h = r.join(o.getPath("userData"), "settings.json"), d = {
+  launchAtLogin: !0,
+  hideOnBlur: !0,
   hotkey: process.platform === "darwin" ? "Command+Shift+Space" : "Control+Shift+Space"
 };
-function loadSettings() {
+function p() {
   try {
-    if (fs.existsSync(SETTINGS_PATH)) {
-      const data = fs.readFileSync(SETTINGS_PATH, "utf-8");
-      return { ...DEFAULT_SETTINGS, ...JSON.parse(data) };
+    if (i.existsSync(h)) {
+      const a = i.readFileSync(h, "utf-8");
+      return { ...d, ...JSON.parse(a) };
     }
-  } catch (err) {
-    console.error("[Electron] Error loading settings:", err);
+  } catch (a) {
+    console.error("[Electron] Error loading settings:", a);
   }
-  return DEFAULT_SETTINGS;
+  return d;
 }
-function initStore() {
-  if (!fs.existsSync(STORE_PATH)) {
-    fs.writeFileSync(STORE_PATH, JSON.stringify([]));
-  }
-  if (!fs.existsSync(SETTINGS_PATH)) {
-    fs.writeFileSync(SETTINGS_PATH, JSON.stringify(DEFAULT_SETTINGS));
-  }
+function _() {
+  i.existsSync(y) || i.writeFileSync(y, JSON.stringify([])), i.existsSync(h) || i.writeFileSync(h, JSON.stringify(d));
 }
-function createWindow() {
-  mainWindow = new BrowserWindow({
+function T() {
+  e = new b({
     width: 750,
     height: 520,
-    frame: false,
-    transparent: true,
-    alwaysOnTop: true,
-    hasShadow: true,
-    show: false,
+    frame: !1,
+    transparent: !0,
+    alwaysOnTop: !0,
+    hasShadow: !0,
+    show: !1,
     webPreferences: {
-      preload: path.join(__dirname$1, "preload.js"),
-      sandbox: false
+      preload: r.join(f, "preload.js"),
+      sandbox: !1
     }
-  });
-  if (process.platform === "darwin") {
-    mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
-    mainWindow.setAlwaysOnTop(true, "screen-saver");
-  } else {
-    mainWindow.setAlwaysOnTop(true);
-  }
-  if (process.env.VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL + "app.html");
-  } else {
-    mainWindow.loadFile(path.join(__dirname$1, "../dist/app.html"));
-  }
-  loadSettings();
-  mainWindow.on("blur", () => {
-    if (loadSettings().hideOnBlur) {
-      mainWindow == null ? void 0 : mainWindow.hide();
-    }
+  }), process.platform === "darwin" ? (e.setVisibleOnAllWorkspaces(!0, { visibleOnFullScreen: !0 }), e.setAlwaysOnTop(!0, "screen-saver")) : e.setAlwaysOnTop(!0), process.env.VITE_DEV_SERVER_URL ? e.loadURL(process.env.VITE_DEV_SERVER_URL + "app.html") : e.loadFile(r.join(f, "../dist/app.html")), p(), e.on("blur", () => {
+    p().hideOnBlur && (e == null || e.hide());
   });
 }
-app.whenReady().then(() => {
-  initStore();
-  createWindow();
-  const iconPath = isDev ? path.join(__dirname$1, "../public/logo-tray.png") : path.join(__dirname$1, "../dist/logo-tray.png");
+o.whenReady().then(() => {
+  _(), T();
+  const a = E ? r.join(f, "../public/logo-tray.png") : r.join(f, "../dist/logo-tray.png");
   try {
-    const trayIcon = nativeImage.createFromPath(iconPath).resize({ width: 18, height: 18 });
-    tray = new Tray(trayIcon);
-    const contextMenu = Menu.buildFromTemplate([
+    const t = k.createFromPath(a).resize({ width: 18, height: 18 });
+    g = new v(t);
+    const s = F.buildFromTemplate([
       { label: "Quit Echo", click: () => {
-        app.quit();
+        o.quit();
       } }
     ]);
-    tray.setToolTip("Echo Snippet Manager");
-    tray.setContextMenu(contextMenu);
-    tray.on("click", () => {
-      if (mainWindow == null ? void 0 : mainWindow.isVisible()) {
-        mainWindow.hide();
-      } else {
-        mainWindow == null ? void 0 : mainWindow.show();
-        mainWindow == null ? void 0 : mainWindow.focus();
-      }
+    g.setToolTip("Echo Snippet Manager"), g.setContextMenu(s), g.on("click", () => {
+      e != null && e.isVisible() ? e.hide() : (e == null || e.show(), e == null || e.focus());
     });
-  } catch (err) {
-    console.error("[Electron] Failed to create tray:", err);
+  } catch (t) {
+    console.error("[Electron] Failed to create tray:", t);
   }
-  function registerGlobalShortcut(accelerator) {
-    globalShortcut.unregisterAll();
+  function u(t) {
+    w.unregisterAll();
     try {
-      const success = globalShortcut.register(accelerator, () => {
-        if (mainWindow) {
-          if (mainWindow.isVisible()) {
-            mainWindow.hide();
-          } else {
-            mainWindow.show();
-            mainWindow.focus();
-          }
-        }
-      });
-      if (!success) console.error(`[Electron] Failed to register shortcut: ${accelerator}`);
-      else console.log(`[Electron] Registered shortcut: ${accelerator}`);
-    } catch (err) {
-      console.error(`[Electron] Error registering shortcut ${accelerator}:`, err);
-      const defaultHotkey = DEFAULT_SETTINGS.hotkey;
-      if (accelerator !== defaultHotkey) {
-        console.log(`[Electron] Falling back to default shortcut: ${defaultHotkey}`);
-        registerGlobalShortcut(defaultHotkey);
-      }
+      w.register(t, () => {
+        e && (e.isVisible() ? e.hide() : (e.show(), e.focus()));
+      }) ? console.log(`[Electron] Registered shortcut: ${t}`) : console.error(`[Electron] Failed to register shortcut: ${t}`);
+    } catch (s) {
+      console.error(`[Electron] Error registering shortcut ${t}:`, s);
+      const l = d.hotkey;
+      t !== l && (console.log(`[Electron] Falling back to default shortcut: ${l}`), u(l));
     }
   }
-  const initialSettings = loadSettings();
+  const O = p();
   try {
-    registerGlobalShortcut(initialSettings.hotkey);
-  } catch (err) {
-    console.error("[Electron] Error registering initial hotkey from settings, falling back to default:", err);
-    registerGlobalShortcut(DEFAULT_SETTINGS.hotkey);
+    u(O.hotkey);
+  } catch (t) {
+    console.error("[Electron] Error registering initial hotkey from settings, falling back to default:", t), u(d.hotkey);
   }
-  ipcMain.handle("get-snippets", () => {
-    const raw = fs.readFileSync(STORE_PATH, "utf-8");
-    console.log("[Electron] get-snippets returning:", raw.substring(0, 100) + "...");
-    return JSON.parse(raw);
-  });
-  ipcMain.handle("save-snippets", (e, snippets) => {
-    console.log("[Electron] save-snippets called with", snippets.length, "items");
-    fs.writeFileSync(STORE_PATH, JSON.stringify(snippets, null, 2));
-    console.log("[Electron] File written successfully");
-  });
-  ipcMain.handle("get-settings", () => {
-    return loadSettings();
-  });
-  ipcMain.handle("save-settings", (e, settings) => {
-    console.log("[Electron] save-settings called:", settings);
-    const oldSettings = loadSettings();
-    fs.writeFileSync(SETTINGS_PATH, JSON.stringify(settings, null, 2));
-    if (settings.hotkey !== oldSettings.hotkey) {
-      registerGlobalShortcut(settings.hotkey);
-    }
-    if (!isDev) {
+  c.handle("get-snippets", () => {
+    const t = i.readFileSync(y, "utf-8");
+    return console.log("[Electron] get-snippets returning:", t.substring(0, 100) + "..."), JSON.parse(t);
+  }), c.handle("save-snippets", (t, s) => {
+    console.log("[Electron] save-snippets called with", s.length, "items"), i.writeFileSync(y, JSON.stringify(s, null, 2)), console.log("[Electron] File written successfully");
+  }), c.handle("get-settings", () => p()), c.handle("save-settings", (t, s) => {
+    console.log("[Electron] save-settings called:", s);
+    const l = p();
+    if (i.writeFileSync(h, JSON.stringify(s, null, 2)), s.hotkey !== l.hotkey && u(s.hotkey), !E)
       try {
-        app.setLoginItemSettings({
-          openAtLogin: settings.launchAtLogin,
-          path: app.getPath("exe")
+        o.setLoginItemSettings({
+          openAtLogin: s.launchAtLogin,
+          path: o.getPath("exe")
         });
-      } catch (err) {
-        console.error("[Electron] Failed to set login item settings:", err);
+      } catch (m) {
+        console.error("[Electron] Failed to set login item settings:", m);
       }
-    }
-    return settings;
-  });
-  ipcMain.handle("hide-window", () => {
-    if (mainWindow) {
-      mainWindow.hide();
-      if (process.platform === "darwin") {
-        app.hide();
-      }
-    }
-  });
-  ipcMain.handle("paste-snippet", async (e, text) => {
-    console.log("[Electron] paste-snippet IPC received with text length:", text.length);
-    if (mainWindow) {
-      if (process.platform === "win32") {
-        mainWindow.setAlwaysOnTop(false);
-        mainWindow.minimize();
-      }
-      mainWindow.hide();
-      if (process.platform === "darwin") {
-        app.hide();
-      }
-    }
-    clipboard.writeText(text);
-    const delay = 0;
-    setTimeout(() => {
-      console.log("[Electron] Attempting auto-paste simulation...");
-      if (process.platform === "darwin") {
-        const script = `osascript -e 'tell application "System Events" to keystroke "v" using command down'`;
-        exec(script, (error) => {
-          if (error) console.error("[Electron] Mac Paste Error:", error);
-        });
-      } else if (process.platform === "win32") {
-        const script = `powershell -WindowStyle Hidden -Command "$wshell = New-Object -ComObject wscript.shell; $wshell.SendKeys('^v')"`;
-        exec(script, (error) => {
-          if (error) console.error("[Electron] Windows Paste Error:", error);
-          if (mainWindow) {
-            mainWindow.setAlwaysOnTop(true);
-          }
-        });
-      }
-    }, delay);
-  });
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
+    return s;
+  }), c.handle("hide-window", () => {
+    e && (e.hide(), process.platform === "darwin" && o.hide());
+  }), c.handle("paste-snippet", async (t, s) => {
+    console.log("[Electron] paste-snippet IPC received with text length:", s.length), e && (process.platform === "win32" && (e.setAlwaysOnTop(!1), e.minimize()), e.hide(), process.platform === "darwin" && o.hide()), P.writeText(s), setTimeout(() => {
+      console.log("[Electron] Attempting auto-paste simulation..."), process.platform === "darwin" ? S(`osascript -e 'tell application "System Events" to keystroke "v" using command down'`, (n) => {
+        n && (console.error("[Electron] Mac Paste Error:", n), (n.message.includes("1002") || n.message.includes("not allowed")) && R.showMessageBox({
+          type: "warning",
+          title: "Accessibility Permission Required",
+          message: 'Echo needs Accessibility permission to "autopaste" snippets.',
+          detail: `To fix this, please go to:
+System Settings > Privacy & Security > Accessibility
+and ensure your Terminal (in development) or the Echo app is enabled.`,
+          buttons: ["Open Settings", "OK"],
+          cancelId: 1,
+          defaultId: 0
+        }).then(({ response: A }) => {
+          A === 0 && j.isTrustedAccessibilityClient(!0);
+        }));
+      }) : process.platform === "win32" && S(`powershell -WindowStyle Hidden -Command "$wshell = New-Object -ComObject wscript.shell; $wshell.SendKeys('^v')"`, (n) => {
+        n && console.error("[Electron] Windows Paste Error:", n), e && e.setAlwaysOnTop(!0);
+      });
+    }, 0);
+  }), o.on("activate", () => {
+    b.getAllWindows().length === 0 && T();
   });
 });
-app.on("window-all-closed", () => {
+o.on("window-all-closed", () => {
 });
-app.on("will-quit", () => {
-  globalShortcut.unregisterAll();
+o.on("will-quit", () => {
+  w.unregisterAll();
 });

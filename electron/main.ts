@@ -1,4 +1,4 @@
-import { app, BrowserWindow, globalShortcut, ipcMain, clipboard, Tray, Menu, nativeImage } from 'electron';
+import { app, BrowserWindow, globalShortcut, ipcMain, clipboard, Tray, Menu, nativeImage, systemPreferences, dialog } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { exec } from 'child_process';
@@ -223,7 +223,27 @@ app.whenReady().then(() => {
       if (process.platform === 'darwin') {
         const script = `osascript -e 'tell application "System Events" to keystroke "v" using command down'`;
         exec(script, (error) => {
-          if (error) console.error('[Electron] Mac Paste Error:', error);
+          if (error) {
+            console.error('[Electron] Mac Paste Error:', error);
+            
+            // Handle common macOS permission error (1002)
+            if (error.message.includes('1002') || error.message.includes('not allowed')) {
+              dialog.showMessageBox({
+                type: 'warning',
+                title: 'Accessibility Permission Required',
+                message: 'Echo needs Accessibility permission to "autopaste" snippets.',
+                detail: 'To fix this, please go to:\nSystem Settings > Privacy & Security > Accessibility\nand ensure your Terminal (in development) or the Echo app is enabled.',
+                buttons: ['Open Settings', 'OK'],
+                cancelId: 1,
+                defaultId: 0
+              }).then(({ response }) => {
+                if (response === 0) {
+                  // This opens the Accessibility settings panel on macOS
+                  systemPreferences.isTrustedAccessibilityClient(true);
+                }
+              });
+            }
+          }
         });
       } else if (process.platform === 'win32') {
         // More resilient Windows approach: Use a temporary VBScript or direct PowerShell with priority

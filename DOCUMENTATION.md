@@ -81,3 +81,11 @@ If you need to build the app locally:
 npm run dist
 ```
 Find the output in the `release/` folder.
+
+## ⚠️ Troubleshooting: macOS Paste Error
+
+If you see an error like `osascript is not allowed to send keystrokes`, it is because macOS requires **Accessibility Permissions** to simulate the "Paste" command.
+
+**To fix:**
+1. Go to **System Settings > Privacy & Security > Accessibility**.
+2. Enable the **Terminal** (during dev) or the **Echo** app (after installation).
