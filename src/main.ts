@@ -236,6 +236,7 @@ function openModal(snippetId: string | null = null) {
   
   editingSnippetId = snippetId;
   isModalOpen = true;
+  isSettingsOpen = false;
   appContainer.classList.add('modal-open');
   modalOverlay.classList.remove('hidden');
   settingsModal.classList.add('hidden');

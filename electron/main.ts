@@ -85,9 +85,9 @@ app.whenReady().then(() => {
   createWindow();
 
   // Create System Tray / Menu Bar Icon
-  const iconPath = isDev 
-    ? path.join(__dirname, '../public/logo.png') 
-    : path.join(__dirname, '../dist/logo.png');
+  const iconPath = isDev
+    ? path.join(__dirname, '../public/logo-tray.png')
+    : path.join(__dirname, '../dist/logo-tray.png');
 
   try {
     const trayIcon = nativeImage.createFromPath(iconPath).resize({ width: 18, height: 18 });
@@ -97,7 +97,7 @@ app.whenReady().then(() => {
     ]);
     tray.setToolTip('Echo Snippet Manager');
     tray.setContextMenu(contextMenu);
-    
+
     // Toggle window on tray click
     tray.on('click', () => {
       if (mainWindow?.isVisible()) {
@@ -216,7 +216,7 @@ app.whenReady().then(() => {
     clipboard.writeText(text);
 
     // Wait for the OS to switch focus back to the target app
-    const delay = process.platform === 'darwin' ? 200 : 500;
+    const delay = 0;
     setTimeout(() => {
       console.log('[Electron] Attempting auto-paste simulation...');
 

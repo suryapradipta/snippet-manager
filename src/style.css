@@ -380,7 +380,8 @@ body {
 }
 
 #modal-subtitle {
-  display: none; /* Simplify header to match app header */
+  display: none;
+  /* Simplify header to match app header */
 }
 
 .btn-close {
@@ -576,14 +577,35 @@ body {
 }
 
 /* Utilities */
-.hidden { display: none !important; }
+.hidden {
+  display: none !important;
+}
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
 
 /* Settings Modal Specific Styles */
 .settings-container {
-  display: flex !important;
+  display: flex;
   width: 100%;
   height: 100%;
   background: transparent;
@@ -793,11 +815,11 @@ body {
   border-radius: 50%;
 }
 
-.toggle input:checked + .toggle-slider {
+.toggle input:checked+.toggle-slider {
   background-color: var(--accent);
 }
 
-.toggle input:checked + .toggle-slider:before {
+.toggle input:checked+.toggle-slider:before {
   transform: translateX(16px);
   background-color: white;
 }
@@ -837,9 +859,17 @@ body {
 }
 
 @keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.6; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
 .hotkey-display span {

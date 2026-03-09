@@ -68,10 +68,9 @@ function createWindow() {
 app.whenReady().then(() => {
   initStore();
   createWindow();
-  const iconPath = isDev ? path.join(__dirname$1, "../public/logo-tray.svg") : path.join(__dirname$1, "../dist/logo-tray.svg");
+  const iconPath = isDev ? path.join(__dirname$1, "../public/logo-tray.png") : path.join(__dirname$1, "../dist/logo-tray.png");
   try {
     const trayIcon = nativeImage.createFromPath(iconPath).resize({ width: 18, height: 18 });
-    trayIcon.setTemplateImage(true);
     tray = new Tray(trayIcon);
     const contextMenu = Menu.buildFromTemplate([
       { label: "Quit Echo", click: () => {
@@ -175,7 +174,7 @@ app.whenReady().then(() => {
       }
     }
     clipboard.writeText(text);
-    const delay = process.platform === "darwin" ? 200 : 500;
+    const delay = 0;
     setTimeout(() => {
       console.log("[Electron] Attempting auto-paste simulation...");
       if (process.platform === "darwin") {
