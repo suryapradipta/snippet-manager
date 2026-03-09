@@ -56,13 +56,17 @@
         </div>
       </div>
       <div class="footer-right">
+        <button id="btn-settings" class="action-btn">
+          <span class="material-symbols-outlined" style="font-size: 18px;">settings</span>
+        </button>
         <span class="status-dot"></span>
       </div>
     </footer>
 
     <!-- Modals -->
     <div id="modal-overlay" class="modal-overlay hidden">
-      <div id="editor-modal" class="modal glass-panel">
+      <!-- Editor Modal -->
+      <div id="editor-modal" class="modal glass-panel hidden">
         <header class="modal-header">
           <div class="header-title">
             <h1 id="modal-title">Create Snippet</h1>
@@ -108,6 +112,105 @@
             </button>
           </div>
         </footer>
+      </div>
+
+      <!-- Settings Modal -->
+      <div id="settings-modal" class="settings-container glass-panel hidden">
+        <aside class="settings-sidebar">
+          <div class="sidebar-header">
+            <img src="/logo.svg" alt="Echo Logo" style="width: 24px; height: 24px;">
+            <span class="logo-text">Echo Preferences</span>
+          </div>
+          <nav class="sidebar-nav">
+            <button class="nav-item active" data-section="general">
+              <span class="material-symbols-outlined">settings</span>
+              <span>General</span>
+            </button>
+            <button class="nav-item" data-section="hotkeys">
+              <span class="material-symbols-outlined">keyboard</span>
+              <span>Hotkeys</span>
+            </button>
+            <button class="nav-item" data-section="about">
+              <span class="material-symbols-outlined">info</span>
+              <span>About</span>
+            </button>
+          </nav>
+          <div class="sidebar-footer">
+            <button id="btn-close-settings" class="btn-ghost" style="width: 100%; justify-content: flex-start; gap: 8px;">
+              <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back</span>
+              Back to App
+            </button>
+          </div>
+        </aside>
+        
+        <section class="settings-content">
+          <header class="content-header">
+            <div>
+              <h2 id="settings-section-title">General</h2>
+              <p id="settings-section-desc">Configure global behavior and application defaults.</p>
+            </div>
+            <button class="btn-reset">Reset to default</button>
+          </header>
+          
+          <div class="settings-body glass-scroll">
+            <div id="section-general" class="settings-section">
+              <h3 class="section-label">Startup & Behavior</h3>
+              <div class="setting-item">
+                <div class="item-info">
+                  <span class="item-label">Launch at login</span>
+                  <span class="item-desc">Automatically start Echo when the system boots.</span>
+                </div>
+                <label class="toggle">
+                  <input type="checkbox" id="setting-launch-login" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <div class="item-info">
+                  <span class="item-label">Hide on focus loss</span>
+                  <span class="item-desc">Close the interface when clicking outside the window.</span>
+                </div>
+                <label class="toggle">
+                  <input type="checkbox" id="setting-hide-blur" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div id="section-hotkeys" class="settings-section hidden">
+              <h3 class="section-label">Global Shortcuts</h3>
+              <div class="setting-item">
+                <div class="item-info">
+                  <span class="item-label">Activation Hotkey</span>
+                  <span class="item-desc">Global combination to trigger the search bar.</span>
+                </div>
+                <button class="hotkey-display">
+                  <kbd class="mod-key">⌘</kbd>
+                  <span>+</span>
+                  <kbd>Shift</kbd>
+                  <span>+</span>
+                  <kbd>Space</kbd>
+                </button>
+              </div>
+            </div>
+
+            <div id="section-about" class="settings-section hidden">
+              <h3 class="section-label">System Information</h3>
+              <div class="setting-item">
+                <div class="item-info">
+                  <span class="item-label">Version</span>
+                  <span class="item-desc">Current build of Echo installed.</span>
+                </div>
+                <span class="version-tag">Build 1.0.3-stable</span>
+              </div>
+            </div>
+          </div>
+          
+          <footer class="content-footer">
+            <span class="footer-label">Premium Environment</span>
+            <span class="footer-build">Build 2026.03.09-rc</span>
+          </footer>
+        </section>
       </div>
     </div>
   </div>
