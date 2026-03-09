@@ -1,11 +1,12 @@
-import { app, globalShortcut, ipcMain, clipboard, BrowserWindow } from "electron";
+import { app, nativeImage, Tray, Menu, globalShortcut, ipcMain, clipboard, BrowserWindow } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 import { exec } from "child_process";
 import fs from "fs";
 const __dirname$1 = path.dirname(fileURLToPath(import.meta.url));
 let mainWindow = null;
-process.env.NODE_ENV !== "development";
+let tray = null;
+const isDev = process.env.NODE_ENV !== "development";
 const STORE_PATH = path.join(app.getPath("userData"), "snippets.json");
 function initStore() {
   if (!fs.existsSync(STORE_PATH)) {
@@ -44,6 +45,28 @@ function createWindow() {
 app.whenReady().then(() => {
   initStore();
   createWindow();
+  const iconPath = isDev ? path.join(__dirname$1, "../public/logo.png") : path.join(__dirname$1, "../dist/logo.png");
+  try {
+    const trayIcon = nativeImage.createFromPath(iconPath).resize({ width: 18, height: 18 });
+    tray = new Tray(trayIcon);
+    const contextMenu = Menu.buildFromTemplate([
+      { label: "Quit Echo", click: () => {
+        app.quit();
+      } }
+    ]);
+    tray.setToolTip("Echo Snippet Manager");
+    tray.setContextMenu(contextMenu);
+    tray.on("click", () => {
+      if (mainWindow == null ? void 0 : mainWindow.isVisible()) {
+        mainWindow.hide();
+      } else {
+        mainWindow == null ? void 0 : mainWindow.show();
+        mainWindow == null ? void 0 : mainWindow.focus();
+      }
+    });
+  } catch (err) {
+    console.error("[Electron] Failed to create tray:", err);
+  }
   const shortcut = process.platform === "darwin" ? "Command+Shift+Space" : "Control+Shift+Space";
   globalShortcut.register(shortcut, () => {
     if (mainWindow) {
@@ -112,9 +135,6 @@ app.whenReady().then(() => {
   });
 });
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
 });
 app.on("will-quit", () => {
   globalShortcut.unregisterAll();

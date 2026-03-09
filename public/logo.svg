@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+    <defs>
+        <!-- Background Gradients -->
+        <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#2D3748" />
+            <stop offset="100%" stop-color="#1A202C" />
+        </linearGradient>
+        <linearGradient id="edgeHighlight" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#4A5568" stop-opacity="0.5" />
+            <stop offset="100%" stop-color="#1A202C" stop-opacity="0" />
+        </linearGradient>
+        
+        <!-- Ribbon Gradients -->
+        <linearGradient id="ribbonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#60A5FA" />
+            <stop offset="100%" stop-color="#2563EB" />
+        </linearGradient>
+        
+        <!-- Subtle 3D Depth Shadow -->
+        <filter id="depthShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.4" />
+        </filter>
+        
+        <!-- Bevel/Highlight Effect for Ribbon -->
+        <filter id="ribbonBevel" x="-10%" y="-10%" width="120%" height="120%">
+            <feSpecularLighting surfaceScale="5" specularConstant="0.8" specularExponent="20" lighting-color="#ffffff">
+                <fePointLight x="256" y="100" z="300" />
+            </feSpecularLighting>
+            <feComposite in2="SourceGraphic" operator="in" />
+            <feComposite in="SourceGraphic" operator="over" />
+        </filter>
+    </defs>
+
+    <!-- Main Icon Container (Squircle) -->
+    <rect x="32" y="32" width="448" height="448" rx="100" fill="url(#bgGrad)" />
+    <!-- Bevel highlight on the top edge of the squircle -->
+    <rect x="32" y="32" width="448" height="448" rx="100" stroke="url(#edgeHighlight)" stroke-width="4" fill="none" />
+
+    <!-- Centered Ribbon with 3D Depth -->
+    <g transform="translate(48, 48) scale(0.81)" filter="url(#depthShadow)">
+        <!-- The main ribbon path -->
+        <path d="M128 128 L384 128 L256 256 L384 384 L128 384" 
+              stroke="url(#ribbonGrad)" stroke-width="52" stroke-linecap="round" stroke-linejoin="round" />
+        <!-- Inner horizontal bar -->
+        <path d="M128 256 L280 256" 
+              stroke="url(#ribbonGrad)" stroke-width="52" stroke-linecap="round" />
+              
+        <!-- Subtle highlight layer to give it a 3D tubular feel -->
+        <path d="M128 128 L384 128 L256 256 L384 384 L128 384" 
+              stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.15" transform="translate(0, -2)" />
+    </g>
+</svg>
