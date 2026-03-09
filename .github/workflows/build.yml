@@ -35,6 +35,8 @@ jobs:
         run: npm run dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
           # Skip macOS signing for now, similar to our local setup
           CSC_LINK: ""
           CSC_KEY_PASSWORD: ""
