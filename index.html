@@ -119,6 +119,12 @@
             right: 20%;
             animation: aura-float 18s infinite reverse ease-in-out;
         }
+
+        @media (max-width: 640px) {
+            .aura-1 { width: 250px; height: 250px; filter: blur(60px); }
+            .aura-2 { width: 200px; height: 200px; filter: blur(60px); }
+            .aura-3 { width: 150px; height: 150px; filter: blur(60px); }
+        }
     </style>
 </head>
 
@@ -200,7 +206,7 @@
 
                         <!-- Echo UI (The "Overlay" App) -->
                         <div
-                            class="glass-card w-[420px] p-4 rounded-xl shadow-2xl flex flex-col gap-3 relative overflow-hidden z-10 -translate-y-4">
+                            class="glass-card w-[90%] sm:w-[420px] p-4 rounded-xl shadow-2xl flex flex-col gap-3 relative overflow-hidden z-10 -translate-y-4">
                             <div id="demo-mockup" class="flex flex-col gap-3">
                                 <div class="flex items-center gap-3 pb-2 border-b border-white/10">
                                     <span class="material-symbols-outlined text-primary">search</span>
@@ -387,7 +393,7 @@
         <section class="max-w-7xl mx-auto px-6 py-24">
             <div class="grid md:grid-cols-2 gap-24 items-center">
                 <div class="order-2 md:order-1">
-                    <div class="glass-card rounded-2xl p-8 font-mono text-sm leading-loose">
+                    <div class="glass-card rounded-2xl p-6 md:p-8 font-mono text-[10px] md:text-sm leading-loose overflow-x-auto">
                         <div class="flex gap-2 mb-4">
                             <div class="size-3 rounded-full bg-red-500/50"></div>
                             <div class="size-3 rounded-full bg-yellow-500/50"></div>
@@ -395,10 +401,10 @@
                         </div>
                         <div class="text-white/40">1   const fetchUser = async (id) =&gt; {</div>
                         <div class="text-white/40">2     const res = await fetch(`</div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-white/40">3       </span>
+                        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                            <span class="text-white/40 whitespace-nowrap">3       </span>
                             <span
-                                class="bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30 font-bold">API_ENDPOINT</span>
+                                class="bg-primary/20 text-primary px-1.5 sm:px-2 py-0.5 rounded border border-primary/30 font-bold text-[9px] sm:text-xs">API_ENDPOINT</span>
                             <span class="text-white/40">/users/${id}?key=</span>
                             <span
                                 class="bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30 font-bold">API_KEY</span>
