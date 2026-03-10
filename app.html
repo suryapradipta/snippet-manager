@@ -218,6 +218,78 @@
       </div>
     </div>
 
+    <!-- Onboarding Overlay -->
+    <div id="onboarding-overlay" class="onboarding-overlay hidden">
+      <div class="onboarding-card">
+        <div id="onboarding-step-1" class="onboarding-step">
+          <div class="step-icon">
+            <span class="material-symbols-outlined">bolt</span>
+          </div>
+          <h2>Welcome to Echo</h2>
+          <p>The minimal snippet manager that works at the speed of thought.</p>
+          
+          <div class="onboarding-hint">
+            <span class="label">Magic Key</span>
+            <div id="onboarding-hotkey-display" class="hotkey-display large">
+              <kbd class="mod-key">⌘</kbd><span>+</span><kbd>Shift</kbd><span>+</span><kbd>Space</kbd>
+            </div>
+          </div>
+          
+          <button class="btn-primary next-step">
+            <span>Continue</span>
+            <span class="material-symbols-outlined">arrow_forward</span>
+          </button>
+        </div>
+
+        <div id="onboarding-step-2" class="onboarding-step hidden">
+          <div class="step-icon">
+            <span class="material-symbols-outlined">content_paste_go</span>
+          </div>
+          <h2>Instant Auto-Paste</h2>
+          <p>Select any snippet and hit <strong>Enter</strong>. We'll teleport it directly into your active code editor or chat.</p>
+          
+          <div class="demo-visual">
+            <div class="demo-editor">
+              <div class="demo-line typing">const user = </div>
+            </div>
+          </div>
+
+          <button class="btn-primary next-step">
+            <span>Next</span>
+            <span class="material-symbols-outlined">arrow_forward</span>
+          </button>
+        </div>
+
+        <div id="onboarding-step-3" class="onboarding-step hidden">
+          <div class="step-icon">
+            <span class="material-symbols-outlined">security</span>
+          </div>
+          <h2>One Last Thing</h2>
+          <p>On macOS, Echo needs <strong>Accessibility Permissions</strong> to perform the "Paste" action for you.</p>
+          
+          <div class="permission-actions">
+            <button id="btn-open-accessibility" class="btn-ghost">
+              <span class="material-symbols-outlined">settings</span>
+              <span>Open System Settings</span>
+            </button>
+          </div>
+
+          <p class="small-hint">Look for "Echo" in the list and toggle it on.</p>
+
+          <button id="btn-onboarding-finish" class="btn-primary">
+            <span>Got it, Launch Echo</span>
+            <span class="material-symbols-outlined">rocket_launch</span>
+          </button>
+        </div>
+
+        <div class="step-indicators">
+          <span class="dot active"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+      </div>
+    </div>
+
     <!-- Auth Screen -->
     <div id="auth-overlay" class="auth-overlay hidden">
       <div class="auth-card">

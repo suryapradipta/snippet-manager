@@ -687,6 +687,35 @@ body {
 
 .sidebar-footer {
   padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-footer .btn-ghost {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 8px;
+}
+
+.sidebar-footer .btn-ghost .material-symbols-outlined {
+  font-size: 20px;
+}
+
+#btn-logout {
+  color: #fca5a5;
+  background: rgba(244, 63, 94, 0.05);
+}
+
+#btn-logout:hover {
+  background: rgba(244, 63, 94, 0.15);
+  color: #f87171;
 }
 
 .settings-content {
@@ -1019,4 +1048,190 @@ body {
 
 .auth-footer .btn-ghost {
   font-size: 13px;
+}
+
+/* Onboarding Flow Styles */
+.onboarding-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-dark);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  backdrop-filter: blur(40px);
+}
+
+.onboarding-card {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+  box-shadow: none;
+  animation: fadeIn 0.8s ease-out;
+  position: relative;
+}
+
+.step-icon {
+  width: 64px;
+  height: 64px;
+  background: var(--accent);
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-bottom: 8px;
+  box-shadow: 0 10px 30px var(--accent-glow);
+}
+
+.step-icon .material-symbols-outlined {
+  font-size: 32px;
+}
+
+.onboarding-card h2 {
+  font-size: 32px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.onboarding-card p {
+  font-size: 16px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  max-width: 400px;
+}
+
+.onboarding-hint {
+  width: 100%;
+  max-width: 360px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.onboarding-hint .label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.hotkey-display.large {
+  padding: 12px;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.hotkey-display.large kbd {
+  font-size: 14px;
+  padding: 4px 10px;
+}
+
+.demo-visual {
+  width: 100%;
+  background: #0a0b14;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.demo-editor {
+  text-align: left;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: rgba(129, 140, 248, 0.8);
+}
+
+.demo-line::after {
+  content: ' "User Profile"';
+  color: #a5b4fc;
+  animation: typing 2.5s infinite steps(13);
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+.step-indicators {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.dot.active {
+  width: 18px;
+  background: var(--accent);
+  border-radius: 4px;
+}
+
+.permission-actions {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 320px;
+}
+
+#btn-open-accessibility {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(129, 140, 248, 0.1);
+  border: 1px solid rgba(129, 140, 248, 0.3);
+  color: var(--accent);
+  height: 52px;
+  font-weight: 600;
+  font-size: 14px;
+  gap: 10px;
+  box-shadow: 0 4px 15px rgba(129, 140, 248, 0.1);
+}
+
+#btn-open-accessibility:hover {
+  background: rgba(129, 140, 248, 0.15);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.small-hint {
+  font-size: 11px !important;
+  opacity: 0.5;
+}
+
+.onboarding-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  animation: fadeIn 0.3s ease-out;
 }

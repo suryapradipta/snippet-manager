@@ -16,7 +16,8 @@ const SETTINGS_PATH = path.join(app.getPath('userData'), 'settings.json');
 const DEFAULT_SETTINGS = {
   launchAtLogin: true,
   hideOnBlur: true,
-  hotkey: process.platform === 'darwin' ? 'Command+Shift+Space' : 'Control+Shift+Space'
+  hotkey: process.platform === 'darwin' ? 'Command+Shift+Space' : 'Control+Shift+Space',
+  hasSeenOnboarding: false
 };
 
 function loadSettings() {
@@ -47,6 +48,7 @@ function createWindow() {
     height: 520,
     frame: false,
     transparent: true,
+    resizable: false,
     alwaysOnTop: true,
     hasShadow: true,
     show: false,
@@ -70,6 +72,12 @@ function createWindow() {
   } else {
     mainWindow.loadFile(path.join(__dirname, '../dist/app.html'));
   }
+
+  // Show window when ready to confirm app is running
+  mainWindow.once('ready-to-show', () => {
+    mainWindow?.show();
+    mainWindow?.focus();
+  });
 
   const settings = loadSettings();
 
@@ -120,6 +128,7 @@ app.whenReady().then(() => {
           if (mainWindow.isVisible()) {
             mainWindow.hide();
           } else {
+            if (mainWindow.isMinimized()) mainWindow.restore();
             mainWindow.show();
             mainWindow.focus();
           }
@@ -204,7 +213,6 @@ app.whenReady().then(() => {
     if (mainWindow) {
       if (process.platform === 'win32') {
         mainWindow.setAlwaysOnTop(false); // Temporarily drop always-on-top to yield focus
-        mainWindow.minimize(); // Minimizing is often more effective on Windows for focus return
       }
       mainWindow.hide();
       if (process.platform === 'darwin') {

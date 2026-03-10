@@ -12,6 +12,7 @@ interface Settings {
   launchAtLogin: boolean;
   hideOnBlur: boolean;
   hotkey: string;
+  hasSeenOnboarding?: boolean;
 }
 
 // Global declaration for our exposed Electron API
@@ -36,7 +37,8 @@ let filteredSnippets: Snippet[] = [];
 let currentSettings: Settings = {
   launchAtLogin: true,
   hideOnBlur: true,
-  hotkey: 'Command+Shift+Space'
+  hotkey: 'Command+Shift+Space',
+  hasSeenOnboarding: false
 };
 let selectedIndex = 0;
 let editingSnippetId: string | null = null;
@@ -87,6 +89,15 @@ const authSubtitle = document.getElementById('auth-subtitle') as HTMLElement;
 const btnAuthSubmit = document.getElementById('btn-auth-submit') as HTMLButtonElement;
 const btnToggleAuth = document.getElementById('btn-toggle-auth') as HTMLButtonElement;
 
+// Onboarding DOM Elements
+const onboardingOverlay = document.getElementById('onboarding-overlay') as HTMLElement;
+// These are multiple elements so we'll use querySelectorAll where appropriate
+const btnOnboardingFinish = document.getElementById('btn-onboarding-finish') as HTMLButtonElement;
+const btnOpenAccessibility = document.getElementById('btn-open-accessibility') as HTMLButtonElement;
+const onboardingHotkeyDisplay = document.getElementById('onboarding-hotkey-display') as HTMLElement;
+
+let currentOnboardingStep = 0;
+
 async function init() {
   console.log('[App] Initializing App...');
   if (!window.electronAPI) {
@@ -94,30 +105,34 @@ async function init() {
     return;
   }
 
-  // Check Auth Session
-  const { data: { session } } = await supabase.auth.getSession();
-  updateAuthState(session?.user ?? null);
-
-  // Listen for auth changes
-  supabase.auth.onAuthStateChange((_event, session) => {
-    updateAuthState(session?.user ?? null);
-  });
-
   try {
+    // 1. Load Platform & Settings FIRST
     platform = await window.electronAPI.getPlatform();
     modKey = platform === 'darwin' ? '⌘' : 'Ctrl';
-
+    currentSettings = await window.electronAPI.getSettings();
+    
     // Update all initial mod-key labels
     document.querySelectorAll('.mod-key').forEach(el => {
       el.textContent = modKey;
     });
-
-    currentSettings = await window.electronAPI.getSettings();
     syncSettingsUI();
 
-    if (currentUser) {
-      await loadSnippets();
-    }
+    // 2. Setup Onboarding Listeners
+    document.querySelectorAll('.next-step').forEach(btn => {
+      (btn as HTMLElement).onclick = () => nextOnboardingStep();
+    });
+    btnOnboardingFinish.onclick = finishOnboarding;
+    btnOpenAccessibility.onclick = () => window.electronAPI.pasteSnippet("");
+
+    // 3. Check Auth Session
+    const { data: { session } } = await supabase.auth.getSession();
+    updateAuthState(session?.user ?? null);
+
+    // Listen for auth changes
+    supabase.auth.onAuthStateChange((_event, session) => {
+      updateAuthState(session?.user ?? null);
+    });
+
   } catch (err) {
     console.error('[App] Failed to load data:', err);
   }
@@ -125,17 +140,66 @@ async function init() {
   searchInput.focus();
 }
 
-function updateAuthState(user: any) {
+async function updateAuthState(user: any) {
   currentUser = user;
   if (user) {
     authOverlay.classList.add('hidden');
     appContainer.classList.remove('modal-open');
-    loadSnippets();
+    
+    // Check if user needs onboarding
+    if (!currentSettings.hasSeenOnboarding) {
+      showOnboarding();
+    } else {
+      loadSnippets();
+    }
   } else {
     authOverlay.classList.remove('hidden');
+    onboardingOverlay.classList.add('hidden'); // Hide onboarding if logged out
     appContainer.classList.add('modal-open');
     resultsList.innerHTML = '';
   }
+}
+
+function showOnboarding() {
+  onboardingOverlay.classList.remove('hidden');
+  appContainer.classList.add('modal-open');
+  currentOnboardingStep = 0;
+  updateOnboardingUI();
+}
+
+function updateOnboardingUI() {
+  const steps = document.querySelectorAll('.onboarding-step');
+  const dots = document.querySelectorAll('.dot');
+
+  steps.forEach((step, idx) => {
+    step.classList.toggle('hidden', idx !== currentOnboardingStep);
+  });
+  
+  dots.forEach((dot, idx) => {
+    dot.classList.toggle('active', idx === currentOnboardingStep);
+  });
+
+  // Update activation hotkey display in onboarding
+  if (onboardingHotkeyDisplay) {
+    const parts = currentSettings.hotkey.replace(/CommandOrControl/g, modKey).replace(/Command/g, '⌘').replace(/Control/g, 'Ctrl').split('+');
+    onboardingHotkeyDisplay.innerHTML = parts.map(p => `<kbd>${p}</kbd>`).join('<span>+</span>');
+  }
+}
+
+function nextOnboardingStep() {
+  const steps = document.querySelectorAll('.onboarding-step');
+  if (currentOnboardingStep < steps.length - 1) {
+    currentOnboardingStep++;
+    updateOnboardingUI();
+  }
+}
+
+async function finishOnboarding() {
+  onboardingOverlay.classList.add('hidden');
+  appContainer.classList.remove('modal-open');
+  await updateSettings({ hasSeenOnboarding: true });
+  loadSnippets();
+  searchInput.focus();
 }
 
 async function loadSnippets() {

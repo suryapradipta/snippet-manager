@@ -64,6 +64,15 @@ Automated builds are configured via GitHub Actions in `.github/workflows/build.y
   - **macOS**: `.dmg` (Universal)
   - **Windows**: `.exe` (NSIS)
 
+## ✨ Onboarding & Quick Start
+
+New users are greeted with a beautiful, three-step onboarding guide that explains:
+1.  **Hotkey Activation**: Visual guide to the global shortcut.
+2.  **Auto-Paste Feature**: Animated demo of how snippets are inserted.
+3.  **Permissions Assistant**: Guided setup for macOS Accessibility access.
+
+This flow is automatically triggered upon the first login and can be reset by clearing the `hasSeenOnboarding` flag in the local `settings.json`.
+
 ## ⌨️ Shortcuts & Interaction
 
 - **Global Activation**: `Cmd+Shift+Space` (macOS) or `Ctrl+Shift+Space` (Windows).
