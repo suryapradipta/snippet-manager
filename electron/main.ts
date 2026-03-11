@@ -111,6 +111,7 @@ app.whenReady().then(() => {
       if (mainWindow?.isVisible()) {
         mainWindow.hide();
       } else {
+        if (mainWindow?.isMinimized()) mainWindow.restore();
         mainWindow?.show();
         mainWindow?.focus();
       }
@@ -212,7 +213,9 @@ app.whenReady().then(() => {
     // 1. Hide the window first to return focus to underlying app
     if (mainWindow) {
       if (process.platform === 'win32') {
-        mainWindow.setAlwaysOnTop(false); // Temporarily drop always-on-top to yield focus
+        mainWindow.blur(); // Force focus to leave Echo
+        mainWindow.setAlwaysOnTop(false); // Drop priority
+        mainWindow.minimize(); // Force Windows to return focus to the previous app
       }
       mainWindow.hide();
       if (process.platform === 'darwin') {

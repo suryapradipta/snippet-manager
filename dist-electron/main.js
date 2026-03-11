@@ -89,6 +89,7 @@ app.whenReady().then(() => {
       if (mainWindow == null ? void 0 : mainWindow.isVisible()) {
         mainWindow.hide();
       } else {
+        if (mainWindow == null ? void 0 : mainWindow.isMinimized()) mainWindow.restore();
         mainWindow == null ? void 0 : mainWindow.show();
         mainWindow == null ? void 0 : mainWindow.focus();
       }
@@ -172,7 +173,9 @@ app.whenReady().then(() => {
     console.log("[Electron] paste-snippet IPC received with text length:", text.length);
     if (mainWindow) {
       if (process.platform === "win32") {
+        mainWindow.blur();
         mainWindow.setAlwaysOnTop(false);
+        mainWindow.minimize();
       }
       mainWindow.hide();
       if (process.platform === "darwin") {
