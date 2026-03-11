@@ -142,6 +142,9 @@ app.whenReady().then(() => {
   ipcMain.handle("get-settings", () => {
     return loadSettings();
   });
+  ipcMain.handle("get-version", () => {
+    return app.getVersion();
+  });
   ipcMain.handle("save-settings", (e, settings) => {
     console.log("[Electron] save-settings called:", settings);
     const oldSettings = loadSettings();

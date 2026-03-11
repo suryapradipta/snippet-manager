@@ -26,6 +26,7 @@ declare global {
       pasteSnippet: (text: string) => Promise<void>;
       hideWindow: () => Promise<void>;
       getPlatform: () => Promise<string>;
+      getVersion: () => Promise<string>;
     }
   }
 }
@@ -116,6 +117,12 @@ async function init() {
       el.textContent = modKey;
     });
     syncSettingsUI();
+
+    // 1.5. Load Version
+    const version = await window.electronAPI.getVersion();
+    document.querySelectorAll('.version-tag, .footer-build').forEach(el => {
+      el.textContent = `v${version}`;
+    });
 
     // 2. Setup Onboarding Listeners
     document.querySelectorAll('.next-step').forEach(btn => {

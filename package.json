@@ -1,7 +1,7 @@
 {
   "name": "echo",
   "productName": "Echo",
-  "version": "1.0.0",
+  "version": "1.0.6",
   "description": "Minimalist code snippet manager with auto-paste.",
   "author": "Echo Team",
   "private": true,
