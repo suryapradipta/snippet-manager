@@ -1,7 +1,7 @@
 import { app, BrowserWindow, globalShortcut, ipcMain, clipboard, Tray, Menu, nativeImage, systemPreferences, dialog } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { exec } from 'child_process';
+import { spawn } from 'child_process';
 import fs from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -212,14 +212,13 @@ app.whenReady().then(() => {
   });
 
   ipcMain.handle('paste-snippet', async (e, text) => {
-    console.log('[Electron] paste-snippet IPC received with text length:', text.length);
+    // 1. Prepare clipboard content immediately
+    if (text) clipboard.writeText(text);
 
-    // 1. Hide the window first to return focus to underlying app
+    // 2. Hide window quickly to return focus to the target application
     if (mainWindow) {
       if (process.platform === 'win32') {
-        mainWindow.blur(); // Force focus to leave Echo
-        mainWindow.setAlwaysOnTop(false); // Drop priority
-        mainWindow.minimize(); // Force Windows to return focus to the previous app
+        mainWindow.setAlwaysOnTop(false);
       }
       mainWindow.hide();
       if (process.platform === 'darwin') {
@@ -227,53 +226,58 @@ app.whenReady().then(() => {
       }
     }
 
-    // Copy the snippet to clipboard
-    clipboard.writeText(text);
-
-    // Wait for the OS to switch focus back to the target app
-    const delay = 0;
+    // 3. Trigger paste simulation
+    // Windows transition animations take longer than macOS, so we give it more breathing room
+    const delay = process.platform === 'darwin' ? 30 : 150; 
+    
     setTimeout(() => {
-      console.log('[Electron] Attempting auto-paste simulation...');
-
       if (process.platform === 'darwin') {
-        const script = `osascript -e 'tell application "System Events" to keystroke "v" using command down'`;
-        exec(script, (error) => {
-          if (error) {
-            console.error('[Electron] Mac Paste Error:', error);
-            
-            // Handle common macOS permission error (1002)
-            if (error.message.includes('1002') || error.message.includes('not allowed')) {
-              dialog.showMessageBox({
-                type: 'warning',
-                title: 'Accessibility Permission Required',
-                message: 'Echo needs Accessibility permission to "autopaste" snippets.',
-                detail: 'To fix this, please go to:\nSystem Settings > Privacy & Security > Accessibility\nand ensure your Terminal (in development) or the Echo app is enabled.',
-                buttons: ['Open Settings', 'OK'],
-                cancelId: 1,
-                defaultId: 0
-              }).then(({ response }) => {
-                if (response === 0) {
-                  // This opens the Accessibility settings panel on macOS
-                  systemPreferences.isTrustedAccessibilityClient(true);
-                }
-              });
-            }
+        const script = 'tell application "System Events" to keystroke "v" using command down';
+        const child = spawn('osascript', ['-e', script], {
+          detached: true,
+          stdio: 'ignore'
+        });
+        
+        child.on('error', (error: any) => {
+          console.error('[Electron] Mac Paste Error:', error);
+          if (error.message?.includes('1002') || error.message?.includes('not allowed')) {
+            showAccessibilityDialog();
           }
         });
+        child.unref();
       } else if (process.platform === 'win32') {
-        // More resilient Windows approach: Use a temporary VBScript or direct PowerShell with priority
-        const script = `powershell -WindowStyle Hidden -Command "$wshell = New-Object -ComObject wscript.shell; $wshell.SendKeys('^v')"`;
-        exec(script, (error) => {
-          if (error) console.error('[Electron] Windows Paste Error:', error);
+        // Use .NET SendKeys via PowerShell for better reliability on Windows
+        // -NoProfile significantly speeds up PowerShell startup
+        const psCommand = "[void][System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.SendKeys]::SendWait('^v')";
+        spawn('powershell.exe', ['-NoProfile', '-WindowStyle', 'Hidden', '-Command', psCommand], {
+          shell: true,
+          detached: true,
+          stdio: 'ignore'
+        }).unref();
 
-          // Restore alwaysOnTop for next time
-          if (mainWindow) {
-            mainWindow.setAlwaysOnTop(true);
-          }
-        });
+        // Restore alwaysOnTop for next time
+        if (mainWindow) {
+          mainWindow.setAlwaysOnTop(true);
+        }
       }
     }, delay);
   });
+
+  function showAccessibilityDialog() {
+    dialog.showMessageBox({
+      type: 'warning',
+      title: 'Accessibility Permission Required',
+      message: 'Echo needs Accessibility permission to "autopaste" snippets.',
+      detail: 'To fix this, please go to:\nSystem Settings > Privacy & Security > Accessibility\nand ensure your Terminal (in development) or the Echo app is enabled.',
+      buttons: ['Open Settings', 'OK'],
+      cancelId: 1,
+      defaultId: 0
+    }).then(({ response }) => {
+      if (response === 0) {
+        systemPreferences.isTrustedAccessibilityClient(true);
+      }
+    });
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

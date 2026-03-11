@@ -1,7 +1,7 @@
 import { app, nativeImage, Tray, Menu, ipcMain, clipboard, dialog, systemPreferences, BrowserWindow, globalShortcut } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
-import { exec } from "child_process";
+import { spawn } from "child_process";
 import fs from "fs";
 const __dirname$1 = path.dirname(fileURLToPath(import.meta.url));
 let mainWindow = null;
@@ -173,55 +173,60 @@ app.whenReady().then(() => {
     }
   });
   ipcMain.handle("paste-snippet", async (e, text) => {
-    console.log("[Electron] paste-snippet IPC received with text length:", text.length);
+    if (text) clipboard.writeText(text);
     if (mainWindow) {
       if (process.platform === "win32") {
-        mainWindow.blur();
         mainWindow.setAlwaysOnTop(false);
-        mainWindow.minimize();
       }
       mainWindow.hide();
       if (process.platform === "darwin") {
         app.hide();
       }
     }
-    clipboard.writeText(text);
-    const delay = 0;
+    const delay = process.platform === "darwin" ? 30 : 150;
     setTimeout(() => {
-      console.log("[Electron] Attempting auto-paste simulation...");
       if (process.platform === "darwin") {
-        const script = `osascript -e 'tell application "System Events" to keystroke "v" using command down'`;
-        exec(script, (error) => {
-          if (error) {
-            console.error("[Electron] Mac Paste Error:", error);
-            if (error.message.includes("1002") || error.message.includes("not allowed")) {
-              dialog.showMessageBox({
-                type: "warning",
-                title: "Accessibility Permission Required",
-                message: 'Echo needs Accessibility permission to "autopaste" snippets.',
-                detail: "To fix this, please go to:\nSystem Settings > Privacy & Security > Accessibility\nand ensure your Terminal (in development) or the Echo app is enabled.",
-                buttons: ["Open Settings", "OK"],
-                cancelId: 1,
-                defaultId: 0
-              }).then(({ response }) => {
-                if (response === 0) {
-                  systemPreferences.isTrustedAccessibilityClient(true);
-                }
-              });
-            }
+        const script = 'tell application "System Events" to keystroke "v" using command down';
+        const child = spawn("osascript", ["-e", script], {
+          detached: true,
+          stdio: "ignore"
+        });
+        child.on("error", (error) => {
+          var _a, _b;
+          console.error("[Electron] Mac Paste Error:", error);
+          if (((_a = error.message) == null ? void 0 : _a.includes("1002")) || ((_b = error.message) == null ? void 0 : _b.includes("not allowed"))) {
+            showAccessibilityDialog();
           }
         });
+        child.unref();
       } else if (process.platform === "win32") {
-        const script = `powershell -WindowStyle Hidden -Command "$wshell = New-Object -ComObject wscript.shell; $wshell.SendKeys('^v')"`;
-        exec(script, (error) => {
-          if (error) console.error("[Electron] Windows Paste Error:", error);
-          if (mainWindow) {
-            mainWindow.setAlwaysOnTop(true);
-          }
-        });
+        const psCommand = "[void][System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.SendKeys]::SendWait('^v')";
+        spawn("powershell.exe", ["-NoProfile", "-WindowStyle", "Hidden", "-Command", psCommand], {
+          shell: true,
+          detached: true,
+          stdio: "ignore"
+        }).unref();
+        if (mainWindow) {
+          mainWindow.setAlwaysOnTop(true);
+        }
       }
     }, delay);
   });
+  function showAccessibilityDialog() {
+    dialog.showMessageBox({
+      type: "warning",
+      title: "Accessibility Permission Required",
+      message: 'Echo needs Accessibility permission to "autopaste" snippets.',
+      detail: "To fix this, please go to:\nSystem Settings > Privacy & Security > Accessibility\nand ensure your Terminal (in development) or the Echo app is enabled.",
+      buttons: ["Open Settings", "OK"],
+      cancelId: 1,
+      defaultId: 0
+    }).then(({ response }) => {
+      if (response === 0) {
+        systemPreferences.isTrustedAccessibilityClient(true);
+      }
+    });
+  }
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
